@@ -15,6 +15,7 @@
  */
 #include "LIEF/ELF/Structures.hpp"
 #include "LIEF/ELF/EnumToString.hpp"
+#include "LIEF/ELF/NoteDetails/core/CorePrStatus.hpp"
 #include "frozen.hpp"
 #include <map>
 
@@ -1339,6 +1340,112 @@ const char* to_string(ELF_SYMBOL_VISIBILITY e) {
 
   auto   it  = enum_strings.find(e);
   return it == enum_strings.end() ? "UNDEFINED" : it->second;
+}
+
+
+const char* to_string(CorePrStatus::REGISTERS e) {
+  CONST_MAP(CorePrStatus::REGISTERS, const char*, 89) enum_strings {
+    { CorePrStatus::REGISTERS::UNKNOWN,     "UNKNOWN"   },
+
+    // X86
+    // ===
+    { CorePrStatus::REGISTERS::X86_EBX,     "X86_EBX"    },
+    { CorePrStatus::REGISTERS::X86_ECX,     "X86_ECX"    },
+    { CorePrStatus::REGISTERS::X86_EDX,     "X86_EDX"    },
+    { CorePrStatus::REGISTERS::X86_ESI,     "X86_ESI"    },
+    { CorePrStatus::REGISTERS::X86_EDI,     "X86_EDI"    },
+    { CorePrStatus::REGISTERS::X86_EBP,     "X86_EBP"    },
+    { CorePrStatus::REGISTERS::X86_EAX,     "X86_EAX"    },
+    { CorePrStatus::REGISTERS::X86_DS,      "X86_DS"     },
+    { CorePrStatus::REGISTERS::X86_ES,      "X86_ES"     },
+    { CorePrStatus::REGISTERS::X86_FS,      "X86_FS"     },
+    { CorePrStatus::REGISTERS::X86_GS,      "X86_GS"     },
+    { CorePrStatus::REGISTERS::X86__,       "X86__"      },
+    { CorePrStatus::REGISTERS::X86_EIP,     "X86_EIP"    },
+    { CorePrStatus::REGISTERS::X86_CS,      "X86_CS"     },
+    { CorePrStatus::REGISTERS::X86_EFLAGS,  "X86_EFLAGS" },
+    { CorePrStatus::REGISTERS::X86_ESP,     "X86_ESP"    },
+    { CorePrStatus::REGISTERS::X86_SS,      "X86_SS"     },
+
+
+    { CorePrStatus::REGISTERS::X86_64_R15,    "X86_64_R15"    },
+    { CorePrStatus::REGISTERS::X86_64_R14,    "X86_64_R14"    },
+    { CorePrStatus::REGISTERS::X86_64_R13,    "X86_64_R13"    },
+    { CorePrStatus::REGISTERS::X86_64_R12,    "X86_64_R12"    },
+    { CorePrStatus::REGISTERS::X86_64_RBP,    "X86_64_RBP"    },
+    { CorePrStatus::REGISTERS::X86_64_RBX,    "X86_64_RBX"    },
+    { CorePrStatus::REGISTERS::X86_64_R11,    "X86_64_R11"    },
+    { CorePrStatus::REGISTERS::X86_64_R10,    "X86_64_R10"    },
+    { CorePrStatus::REGISTERS::X86_64_R9,     "X86_64_R9"     },
+    { CorePrStatus::REGISTERS::X86_64_R8,     "X86_64_R8"     },
+    { CorePrStatus::REGISTERS::X86_64_RAX,    "X86_64_RAX"    },
+    { CorePrStatus::REGISTERS::X86_64_RCX,    "X86_64_RCX"    },
+    { CorePrStatus::REGISTERS::X86_64_RDX,    "X86_64_RDX"    },
+    { CorePrStatus::REGISTERS::X86_64_RSI,    "X86_64_RSI"    },
+    { CorePrStatus::REGISTERS::X86_64_RDI,    "X86_64_RDI"    },
+    { CorePrStatus::REGISTERS::X86_64__,      "X86_64__"      },
+    { CorePrStatus::REGISTERS::X86_64_RIP,    "X86_64_RIP"    },
+    { CorePrStatus::REGISTERS::X86_64_CS,     "X86_64_CS"     },
+    { CorePrStatus::REGISTERS::X86_64_EFLAGS, "X86_64_EFLAGS" },
+    { CorePrStatus::REGISTERS::X86_64_RSP,    "X86_64_RSP"    },
+    { CorePrStatus::REGISTERS::X86_64_SS,     "X86_64_SS"     },
+
+    { CorePrStatus::REGISTERS::ARM_R0,  "ARM_R0"  },
+    { CorePrStatus::REGISTERS::ARM_R1,  "ARM_R1"  },
+    { CorePrStatus::REGISTERS::ARM_R2,  "ARM_R2"  },
+    { CorePrStatus::REGISTERS::ARM_R3,  "ARM_R3"  },
+    { CorePrStatus::REGISTERS::ARM_R4,  "ARM_R4"  },
+    { CorePrStatus::REGISTERS::ARM_R5,  "ARM_R5"  },
+    { CorePrStatus::REGISTERS::ARM_R6,  "ARM_R6"  },
+    { CorePrStatus::REGISTERS::ARM_R7,  "ARM_R7"  },
+    { CorePrStatus::REGISTERS::ARM_R8,  "ARM_R8"  },
+    { CorePrStatus::REGISTERS::ARM_R9,  "ARM_R9"  },
+    { CorePrStatus::REGISTERS::ARM_R10, "ARM_R10" },
+    { CorePrStatus::REGISTERS::ARM_R11, "ARM_R11" },
+    { CorePrStatus::REGISTERS::ARM_R12, "ARM_R12" },
+    { CorePrStatus::REGISTERS::ARM_R13, "ARM_R13" },
+    { CorePrStatus::REGISTERS::ARM_R14, "ARM_R14" },
+    { CorePrStatus::REGISTERS::ARM_R15, "ARM_R15" },
+
+    { CorePrStatus::REGISTERS::AARCH64_X0,  "AARCH64_X0"   },
+    { CorePrStatus::REGISTERS::AARCH64_X1,  "AARCH64_X1"   },
+    { CorePrStatus::REGISTERS::AARCH64_X2,  "AARCH64_X2"   },
+    { CorePrStatus::REGISTERS::AARCH64_X3,  "AARCH64_X3"   },
+    { CorePrStatus::REGISTERS::AARCH64_X4,  "AARCH64_X4"   },
+    { CorePrStatus::REGISTERS::AARCH64_X5,  "AARCH64_X5"   },
+    { CorePrStatus::REGISTERS::AARCH64_X6,  "AARCH64_X6"   },
+    { CorePrStatus::REGISTERS::AARCH64_X7,  "AARCH64_X7"   },
+    { CorePrStatus::REGISTERS::AARCH64_X8,  "AARCH64_X8"   },
+    { CorePrStatus::REGISTERS::AARCH64_X9,  "AARCH64_X9"   },
+    { CorePrStatus::REGISTERS::AARCH64_X10, "AARCH64_X10"  },
+    { CorePrStatus::REGISTERS::AARCH64_X11, "AARCH64_X11"  },
+    { CorePrStatus::REGISTERS::AARCH64_X12, "AARCH64_X12"  },
+    { CorePrStatus::REGISTERS::AARCH64_X13, "AARCH64_X13"  },
+    { CorePrStatus::REGISTERS::AARCH64_X14, "AARCH64_X14"  },
+    { CorePrStatus::REGISTERS::AARCH64_X15, "AARCH64_X15"  },
+    { CorePrStatus::REGISTERS::AARCH64_X16, "AARCH64_X16"  },
+    { CorePrStatus::REGISTERS::AARCH64_X17, "AARCH64_X17"  },
+    { CorePrStatus::REGISTERS::AARCH64_X18, "AARCH64_X18"  },
+    { CorePrStatus::REGISTERS::AARCH64_X19, "AARCH64_X19"  },
+    { CorePrStatus::REGISTERS::AARCH64_X20, "AARCH64_X20"  },
+    { CorePrStatus::REGISTERS::AARCH64_X21, "AARCH64_X21"  },
+    { CorePrStatus::REGISTERS::AARCH64_X22, "AARCH64_X22"  },
+    { CorePrStatus::REGISTERS::AARCH64_X23, "AARCH64_X23"  },
+    { CorePrStatus::REGISTERS::AARCH64_X24, "AARCH64_X24"  },
+    { CorePrStatus::REGISTERS::AARCH64_X25, "AARCH64_X25"  },
+    { CorePrStatus::REGISTERS::AARCH64_X26, "AARCH64_X26"  },
+    { CorePrStatus::REGISTERS::AARCH64_X27, "AARCH64_X27"  },
+    { CorePrStatus::REGISTERS::AARCH64_X28, "AARCH64_X28"  },
+    { CorePrStatus::REGISTERS::AARCH64_X29, "AARCH64_X29"  },
+    { CorePrStatus::REGISTERS::AARCH64_X30, "AARCH64_X30"  },
+    { CorePrStatus::REGISTERS::AARCH64_X31, "AARCH64_X31"  },
+    { CorePrStatus::REGISTERS::AARCH64_PC,  "AARCH64_PC"   },
+    { CorePrStatus::REGISTERS::AARCH64__,   "AARCH64__"    },
+
+  };
+
+  auto   it  = enum_strings.find(e);
+  return it == enum_strings.end() ? "UNKNOWN" : it->second;
 }
 
 

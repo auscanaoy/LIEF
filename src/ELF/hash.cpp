@@ -229,6 +229,9 @@ void Hash::visit(const CorePrPsInfo& pinfo) {
   process(pinfo.sid());
 }
 
+void Hash::visit(const CorePrStatus& pinfo) {
+}
+
 void Hash::visit(const CoreFile& file) {
   process(file.count());
   for (const CoreFileEntry& entry : file.files()) {

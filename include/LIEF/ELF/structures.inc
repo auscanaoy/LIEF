@@ -304,6 +304,59 @@ struct Elf32_Prpsinfo
   char     pr_psargs[80]; /**< Initial part of arg list */
 };
 
+struct Elf_siginfo {
+  int32_t si_signo;
+  int32_t si_code;
+  int32_t si_errno;
+};
+
+struct Elf32_timeval {
+  uint32_t tv_sec;
+  uint32_t tv_usec;
+};
+
+struct Elf64_timeval {
+  uint64_t tv_sec;
+  uint64_t tv_usec;
+};
+
+/** Structure for note type NT_PRSTATUS */
+struct Elf32_Prstatus {
+  Elf_siginfo   pr_info;
+  uint16_t      pr_cursig;
+
+  uint32_t      pr_sigpend;
+  uint32_t      pr_sighold;
+
+  int32_t       pr_pid;
+  int32_t       pr_ppid;
+  int32_t       pr_pgrp;
+  int32_t       pr_sid;
+
+  Elf32_timeval pr_utime;
+  Elf32_timeval pr_stime;
+  Elf32_timeval pr_cutime;
+  Elf32_timeval pr_cstime;
+};
+
+struct Elf64_Prstatus {
+  Elf_siginfo   pr_info;
+  uint16_t      pr_cursig;
+
+  uint64_t      pr_sigpend;
+  uint64_t      pr_sighold;
+
+  int32_t       pr_pid;
+  int32_t       pr_ppid;
+  int32_t       pr_pgrp;
+  int32_t       pr_sid;
+
+  Elf64_timeval pr_utime;
+  Elf64_timeval pr_stime;
+  Elf64_timeval pr_cutime;
+  Elf64_timeval pr_cstime;
+};
+
 /** Structure for note type NT_FILE */
 struct Elf64_FileEntry
 {

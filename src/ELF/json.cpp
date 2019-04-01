@@ -416,23 +416,27 @@ void JsonVisitor::visit(const NoteAbi& note_abi) {
 
 void JsonVisitor::visit(const CorePrPsInfo& pinfo) {
   this->node_["file_name"] = pinfo.file_name();
-  this->node_["flags"] = pinfo.flags();
-  this->node_["uid"] = pinfo.uid();
-  this->node_["gid"] = pinfo.gid();
-  this->node_["pid"] = pinfo.pid();
-  this->node_["ppid"] = pinfo.ppid();
-  this->node_["pgrp"] = pinfo.pgrp();
-  this->node_["sid"] = pinfo.sid();
+  this->node_["flags"]     = pinfo.flags();
+  this->node_["uid"]       = pinfo.uid();
+  this->node_["gid"]       = pinfo.gid();
+  this->node_["pid"]       = pinfo.pid();
+  this->node_["ppid"]      = pinfo.ppid();
+  this->node_["pgrp"]      = pinfo.pgrp();
+  this->node_["sid"]       = pinfo.sid();
+}
+
+
+void JsonVisitor::visit(const CorePrStatus& pinfo) {
 }
 
 void JsonVisitor::visit(const CoreFile& file) {
   std::vector<json> files;
   for (const CoreFileEntry& entry : file.files()) {
     const json file = {
-      {"start", entry.start},
-      {"end", entry.end},
+      {"start",    entry.start},
+      {"end",      entry.end},
       {"file_ofs", entry.file_ofs},
-      {"path", entry.path}
+      {"path",     entry.path}
     };
     files.emplace_back(file);
   }

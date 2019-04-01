@@ -17,6 +17,7 @@
 #define LIEF_ELF_NOTE_DETAILS_CORE_H_
 
 #include "LIEF/ELF/NoteDetails/core/CorePrPsInfo.hpp"
+#include "LIEF/ELF/NoteDetails/core/CorePrStatus.hpp"
 #include "LIEF/ELF/NoteDetails/core/CoreFile.hpp"
 
 #endif

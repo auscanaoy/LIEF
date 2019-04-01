@@ -20,62 +20,45 @@
 #include "LIEF/ELF/hash.hpp"
 #include "LIEF/ELF/EnumToString.hpp"
 
-#include "CoreFile.tcc"
+#include "CorePrStatus.tcc"
 
 namespace LIEF {
 namespace ELF {
 
-CoreFile::CoreFile(Note& note):
-  NoteDetails::NoteDetails{note},
-  files_{}
+CorePrStatus::CorePrStatus(Note& note):
+  NoteDetails::NoteDetails{note}
 {}
 
-CoreFile CoreFile::make(Note& note) {
-  CoreFile file(note);
-  file.parse();
-  return file;
+CorePrStatus CorePrStatus::make(Note& note) {
+  CorePrStatus pinfo(note);
+  pinfo.parse();
+  return pinfo;
 }
 
 
-uint64_t CoreFile::count(void) const {
-  return this->files_.size();
+CorePrStatus::reg_context_t CorePrStatus::reg_context(void) const {
+  return {};
 }
 
-std::vector<CoreFileEntry> CoreFile::files(void) const {
-  std::vector<CoreFileEntry> entries;
-  entries.reserve(this->count());
-  std::copy(
-      std::begin(this->files_),
-      std::end(this->files_),
-      std::back_inserter(entries));
-  return entries;
-}
-
-
-void CoreFile::files(const std::vector<CoreFileEntry>& files) {
-  this->files_ = files;
-  this->build();
-}
-
-
-void CoreFile::accept(Visitor& visitor) const {
+void CorePrStatus::accept(Visitor& visitor) const {
   visitor.visit(*this);
 }
 
-bool CoreFile::operator==(const CoreFile& rhs) const {
+bool CorePrStatus::operator==(const CorePrStatus& rhs) const {
   size_t hash_lhs = Hash::hash(*this);
   size_t hash_rhs = Hash::hash(rhs);
   return hash_lhs == hash_rhs;
 }
 
-bool CoreFile::operator!=(const CoreFile& rhs) const {
+bool CorePrStatus::operator!=(const CorePrStatus& rhs) const {
   return not (*this == rhs);
 }
 
-void CoreFile::dump(std::ostream&) const {
+void CorePrStatus::dump(std::ostream& os) const {
+  os << std::left;
 }
 
-void CoreFile::parse(void) {
+void CorePrStatus::parse(void) {
   if (this->binary()->type() == ELF_CLASS::ELFCLASS64) {
     this->parse_<ELF64>();
   } else if (this->binary()->type() == ELF_CLASS::ELFCLASS32) {
@@ -83,7 +66,7 @@ void CoreFile::parse(void) {
   }
 }
 
-void CoreFile::build(void) {
+void CorePrStatus::build(void) {
   if (this->binary()->type() == ELF_CLASS::ELFCLASS64) {
     this->build_<ELF64>();
   } else if (this->binary()->type() == ELF_CLASS::ELFCLASS32) {
@@ -91,20 +74,12 @@ void CoreFile::build(void) {
   }
 }
 
-std::ostream& operator<<(std::ostream& os, const CoreFile& note) {
+std::ostream& operator<<(std::ostream& os, const CorePrStatus& note) {
   note.dump(os);
-
-  for (const CoreFileEntry& file : note.files()) {
-    os << " - ";
-    os << file.path << " ";
-    os << "[" << std::hex << std::showbase << file.start << ", " << file.end << "] ";
-    os << file.file_ofs;
-    os << std::endl;
-  }
   return os;
 }
 
-CoreFile::~CoreFile(void) = default;
+CorePrStatus::~CorePrStatus(void) = default;
 
 } // namespace ELF
 } // namespace LIEF

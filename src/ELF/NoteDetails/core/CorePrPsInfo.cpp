@@ -130,10 +130,11 @@ bool CorePrPsInfo::operator!=(const CorePrPsInfo& rhs) const {
 }
 
 void CorePrPsInfo::dump(std::ostream& os) const {
-  os << std::setw(33) << std::setfill(' ') << "File name: " << std::dec << this->file_name() << std::endl;
-  os << std::setw(33) << std::setfill(' ') << "UID: " << std::dec << this->uid() << std::endl;
-  os << std::setw(33) << std::setfill(' ') << "GID: " << std::dec << this->gid() << std::endl;
-  os << std::setw(33) << std::setfill(' ') << "PID: " << std::dec << this->pid() << std::endl;
+  os << std::left;
+  os << std::setw(12) << std::setfill(' ') << "File name: " << std::dec << this->file_name() << std::endl;
+  os << std::setw(12) << std::setfill(' ') << "UID: " << std::dec << this->uid() << std::endl;
+  os << std::setw(12) << std::setfill(' ') << "GID: " << std::dec << this->gid() << std::endl;
+  os << std::setw(12) << std::setfill(' ') << "PID: " << std::dec << this->pid() << std::endl;
 }
 
 void CorePrPsInfo::parse(void) {

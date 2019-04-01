@@ -142,11 +142,19 @@ NoteDetails& Note::details(void) {
           details.reset(new CorePrPsInfo{CorePrPsInfo::make(*this)});
           break;
         }
+
       case NOTE_TYPES_CORE::NT_FILE:
         {
           details.reset(new CoreFile{CoreFile::make(*this)});
           break;
         }
+
+      case NOTE_TYPES_CORE::NT_PRSTATUS:
+        {
+          details.reset(new CorePrStatus{CorePrStatus::make(*this)});
+          break;
+        }
+
       default:
         break;
     }

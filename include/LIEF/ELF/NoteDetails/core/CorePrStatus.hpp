@@ -1,0 +1,131 @@
+/* Copyright 2017 R. Thomas
+ * Copyright 2017 Quarkslab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#ifndef LIEF_ELF_CORE_PRSTATUS_H_
+#define LIEF_ELF_CORE_PRSTATUS_H_
+
+#include <vector>
+#include <iostream>
+#include <map>
+
+#include "LIEF/Object.hpp"
+#include "LIEF/visibility.h"
+
+#include "LIEF/ELF/Note.hpp"
+#include "LIEF/ELF/NoteDetails.hpp"
+
+namespace LIEF {
+namespace ELF {
+
+class Parser;
+class Builder;
+class Binary;
+
+//! Class representing core PrPsInfo object
+class LIEF_API CorePrStatus : public NoteDetails {
+
+  public:
+  using NoteDetails::NoteDetails;
+
+  enum class REGISTERS  {
+    UNKNOWN,
+
+    // x86
+    // ===
+    X86_START,
+      X86_EBX, X86_ECX, X86_EDX, X86_ESI, X86_EDI, X86_EBP, X86_EAX,
+      X86_DS, X86_ES, X86_FS, X86_GS, X86__, X86_EIP, X86_CS, X86_EFLAGS, X86_ESP, X86_SS,
+    X86_END,
+
+    // x86-64
+    // ======
+    X86_64_START,
+      X86_64_R15, X86_64_R14, X86_64_R13, X86_64_R12, X86_64_RBP, X86_64_RBX, X86_64_R11, X86_64_R10,
+      X86_64_R9, X86_64_R8, X86_64_RAX, X86_64_RCX, X86_64_RDX, X86_64_RSI, X86_64_RDI, X86_64__,
+      X86_64_RIP, X86_64_CS, X86_64_EFLAGS, X86_64_RSP, X86_64_SS,
+    X86_64_END,
+
+    // ARM
+    // ===
+    ARM_START,
+      ARM_R0, ARM_R1, ARM_R2,  ARM_R3,  ARM_R4,  ARM_R5,  ARM_R6,  ARM_R7,
+      ARM_R8, ARM_R9, ARM_R10, ARM_R11, ARM_R12, ARM_R13, ARM_R14, ARM_R15,
+    ARM_END,
+
+    // AArch64
+    // =======
+    AARCH64_START,
+      AARCH64_X0,  AARCH64_X1,  AARCH64_X2,  AARCH64_X3,  AARCH64_X4,  AARCH64_X5,  AARCH64_X6,  AARCH64_X7,
+      AARCH64_X8,  AARCH64_X9,  AARCH64_X10, AARCH64_X11, AARCH64_X12, AARCH64_X13, AARCH64_X14, AARCH64_X15,
+      AARCH64_X16, AARCH64_X17, AARCH64_X18, AARCH64_X19, AARCH64_X20, AARCH64_X21, AARCH64_X22, AARCH64_X23,
+      AARCH64_X24, AARCH64_X25, AARCH64_X26, AARCH64_X27, AARCH64_X28, AARCH64_X29, AARCH64_X30, AARCH64_X31,
+      AARCH64_PC, AARCH64__,
+    AARCH64_END,
+  };
+  using reg_context_t = std::map<REGISTERS, uint64_t>;
+
+  public:
+  static CorePrStatus make(Note& note);
+
+  reg_context_t reg_context(void) const;
+
+  bool operator==(const CorePrStatus& rhs) const;
+  bool operator!=(const CorePrStatus& rhs) const;
+
+  virtual void dump(std::ostream& os) const override;
+
+  virtual void accept(Visitor& visitor) const override;
+
+  virtual ~CorePrStatus(void);
+
+  LIEF_API friend std::ostream& operator<<(std::ostream& os, const CorePrStatus& note);
+
+  protected:
+  template <typename ELF_T>
+  LIEF_LOCAL void parse_(void);
+
+  template <typename ELF_T>
+  LIEF_LOCAL void build_(void);
+
+  virtual void parse(void) override;
+  virtual void build(void) override;
+
+  private:
+  CorePrStatus(Note& note);
+
+  Elf_siginfo siginfo_;
+  uint16_t    cursig_;
+
+  uint64_t    sigpend_;
+  uint64_t    sighold_;
+
+  int32_t    pid_;
+  int32_t    ppid_;
+  int32_t    pgrp_;
+  int32_t    sid_;
+
+  Elf64_timeval utime_;
+  Elf64_timeval stime_;
+  Elf64_timeval cutime_;
+  Elf64_timeval cstime_;
+};
+
+
+LIEF_API const char* to_string(CorePrStatus::REGISTERS e);
+
+} // namepsace ELF
+} // namespace LIEF
+
+#endif

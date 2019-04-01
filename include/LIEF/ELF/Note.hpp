@@ -18,6 +18,7 @@
 
 #include <vector>
 #include <iostream>
+#include <memory>
 
 #include "LIEF/Object.hpp"
 #include "LIEF/visibility.h"

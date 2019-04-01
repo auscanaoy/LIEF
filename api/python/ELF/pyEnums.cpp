@@ -1171,6 +1171,8 @@ void init_enums(py::module& m) {
     .value(PY_ENUM(ELF_SYMBOL_VISIBILITY::STV_INTERNAL))
     .value(PY_ENUM(ELF_SYMBOL_VISIBILITY::STV_PROTECTED));
 
+
+
 }
 
 }
