@@ -21,6 +21,8 @@
 
 #include "LIEF/ELF/NoteDetails/core/CorePrStatus.hpp"
 
+#include "LIEF/logging++.hpp"
+
 
 namespace LIEF {
 namespace ELF {
@@ -47,10 +49,18 @@ void CorePrStatus::parse_(void) {
   this->pgrp_ = status->pr_pgrp;
   this->sid_  = status->pr_sid;
 
-  //this->utime_  = status->pr_utime;
-  //this->stime_  = status->pr_stime;
-  //this->cutime_ = status->pr_cutime;
-  //this->cstime_ = status->pr_cstime;
+  this->utime_.tv_sec  = status->pr_utime.tv_sec;
+  this->utime_.tv_usec = status->pr_utime.tv_usec;
+
+  this->stime_.tv_sec  = status->pr_stime.tv_sec;
+  this->stime_.tv_usec = status->pr_stime.tv_usec;
+
+  this->cutime_.tv_sec  = status->pr_cutime.tv_sec;
+  this->cutime_.tv_usec = status->pr_cutime.tv_usec;
+
+  this->cstime_.tv_sec  = status->pr_cstime.tv_sec;
+  this->cstime_.tv_usec = status->pr_cstime.tv_usec;
+
   if (this->binary() == nullptr) {
     return;
   }
@@ -86,17 +96,22 @@ void CorePrStatus::parse_(void) {
         enum_end  = static_cast<size_t>(REGISTERS::AARCH64_END);
         break;
       }
+
+    default:
+      {
+        LOG(WARNING) << to_string(arch) << " not supported";
+      }
   }
 
 
   const VectorStream& stream(description);
-  stream.setpos(sizeof(Elf_Prstatus));
+  stream.setpos(sizeof(Elf_Prstatus) + /* Padding */ 2);
 
   for (size_t i = enum_start; i < enum_end; ++i) {
     if (not stream.can_read<uint__>()) {
       break;
     }
-    std::cout << std::hex << std::showbase << to_string(static_cast<REGISTERS>(i)) << ": " << stream.read<uint__>() << std::endl;
+    this->ctx_[static_cast<REGISTERS>(i)] = stream.read<uint__>();
   }
 
 

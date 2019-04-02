@@ -61,6 +61,7 @@ void init_objects(py::module& m) {
   CREATE(CorePrPsInfo, m);
   CREATE(CoreFile, m);
   CREATE(CoreFileEntry, m);
+  CREATE(CorePrStatus, m);
 }
 
 }

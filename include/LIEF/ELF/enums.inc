@@ -909,6 +909,18 @@ enum _LIEF_EN(NOTE_TYPES_CORE) {
   _LIEF_EI(NT_SIGINFO)          = 0x53494749,
   _LIEF_EI(NT_FILE)             = 0x46494c45,
   _LIEF_EI(NT_PRXFPREG)         = 0x46e62b7f,
+
+  _LIEF_EI(NT_ARM_VFP)          = 0x400,
+  _LIEF_EI(NT_ARM_TLS)          = 0x401,
+  _LIEF_EI(NT_ARM_HW_BREAK)     = 0x402,
+  _LIEF_EI(NT_ARM_HW_WATCH)     = 0x403,
+  _LIEF_EI(NT_ARM_SYSTEM_CALL)  = 0x404,
+  _LIEF_EI(NT_ARM_SVE)          = 0x405,
+
+  _LIEF_EI(NT_386_TLS)          = 0x200,
+  _LIEF_EI(NT_386_IOPERM)       = 0x201,
+  _LIEF_EI(NT_386_XSTATE)       = 0x202,
+
 };
 
 

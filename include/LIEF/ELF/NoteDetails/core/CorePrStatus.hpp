@@ -79,7 +79,41 @@ class LIEF_API CorePrStatus : public NoteDetails {
   public:
   static CorePrStatus make(Note& note);
 
-  reg_context_t reg_context(void) const;
+  const Elf_siginfo& siginfo(void) const;
+  uint16_t current_sig(void) const;
+
+  uint64_t sigpend(void) const;
+  uint64_t sighold(void) const;
+
+  int32_t pid(void) const;
+  int32_t ppid(void) const;
+  int32_t pgrp(void) const;
+  int32_t sid(void) const;
+
+  Elf64_timeval utime(void) const;
+  Elf64_timeval stime(void) const;
+  Elf64_timeval cutime(void) const;
+  Elf64_timeval cstime(void) const;
+
+  const reg_context_t& reg_context(void) const;
+
+  void siginfo(const Elf_siginfo& siginfo);
+  void current_sig(uint16_t current_sig);
+
+  void sigpend(uint64_t sigpend);
+  void sighold(uint64_t sighold);
+
+  void pid(int32_t pid);
+  void ppid(int32_t ppid);
+  void pgrp(int32_t pgrp);
+  void sid(int32_t sid);
+
+  void utime(Elf64_timeval utime);
+  void stime(Elf64_timeval stime);
+  void cutime(Elf64_timeval cutime);
+  void cstime(Elf64_timeval cstime);
+
+  void reg_context(const reg_context_t& ctx);
 
   bool operator==(const CorePrStatus& rhs) const;
   bool operator!=(const CorePrStatus& rhs) const;
@@ -120,6 +154,8 @@ class LIEF_API CorePrStatus : public NoteDetails {
   Elf64_timeval stime_;
   Elf64_timeval cutime_;
   Elf64_timeval cstime_;
+
+  reg_context_t ctx_;
 };
 
 

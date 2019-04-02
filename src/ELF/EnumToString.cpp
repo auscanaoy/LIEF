@@ -1086,7 +1086,7 @@ const char* to_string(NOTE_TYPES e) {
 
 
 const char* to_string(NOTE_TYPES_CORE e) {
-  CONST_MAP(NOTE_TYPES_CORE, const char*, 9) enumStrings {
+  CONST_MAP(NOTE_TYPES_CORE, const char*, 17) enumStrings {
     { NOTE_TYPES_CORE::NT_CORE_UNKNOWN,     "UNKNOWN"},
     { NOTE_TYPES_CORE::NT_PRSTATUS,         "PRSTATUS"},
     { NOTE_TYPES_CORE::NT_PRFPREG,          "PRFPREG"},
@@ -1095,11 +1095,21 @@ const char* to_string(NOTE_TYPES_CORE e) {
     { NOTE_TYPES_CORE::NT_AUXV,             "AUXV"},
     { NOTE_TYPES_CORE::NT_SIGINFO,          "SIGINFO"},
     { NOTE_TYPES_CORE::NT_FILE,             "FILE"},
-    { NOTE_TYPES_CORE::NT_PRXFPREG,         "PRXFPREG"},
+
+    { NOTE_TYPES_CORE::NT_ARM_VFP,          "ARM_VFP"},
+    { NOTE_TYPES_CORE::NT_ARM_TLS,          "ARM_TLS"},
+    { NOTE_TYPES_CORE::NT_ARM_HW_BREAK,     "ARM_HW_BREAK"},
+    { NOTE_TYPES_CORE::NT_ARM_HW_WATCH,     "ARM_HW_WATCH"},
+    { NOTE_TYPES_CORE::NT_ARM_SYSTEM_CALL,  "ARM_SYSTEM_CALL"},
+    { NOTE_TYPES_CORE::NT_ARM_SVE,          "ARM_SVE"},
+
+    { NOTE_TYPES_CORE::NT_386_TLS,          "I386_TLS"},
+    { NOTE_TYPES_CORE::NT_386_IOPERM,       "I386_IOPERM"},
+    { NOTE_TYPES_CORE::NT_386_XSTATE,       "I386_XSTATE"},
   };
 
   auto   it  = enumStrings.find(e);
-  return it == enumStrings.end() ? "UNDEFINED" : it->second;
+  return it == enumStrings.end() ? "UNKNOWN" : it->second;
 }
 
 
