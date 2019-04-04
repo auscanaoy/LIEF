@@ -79,22 +79,43 @@ class LIEF_API CorePrStatus : public NoteDetails {
   public:
   static CorePrStatus make(Note& note);
 
+  //! Info associated with signal
   const Elf_siginfo& siginfo(void) const;
+
+  //! Current Signal
   uint16_t current_sig(void) const;
 
+  //! Set of pending signals
   uint64_t sigpend(void) const;
+
+  //! Set of held signals
   uint64_t sighold(void) const;
 
+  //! Process ID
   int32_t pid(void) const;
+
+  //! Process parent ID
   int32_t ppid(void) const;
+
+  //! Process group ID
   int32_t pgrp(void) const;
+
+  //! Process session ID
   int32_t sid(void) const;
 
+  //! User time
   Elf64_timeval utime(void) const;
+
+  //! System time
   Elf64_timeval stime(void) const;
+
+  //! Cumulative user time
   Elf64_timeval cutime(void) const;
+
+  //! Cumulative system time
   Elf64_timeval cstime(void) const;
 
+  //! GP registers state
   const reg_context_t& reg_context(void) const;
 
   void siginfo(const Elf_siginfo& siginfo);
@@ -119,6 +140,9 @@ class LIEF_API CorePrStatus : public NoteDetails {
   bool operator!=(const CorePrStatus& rhs) const;
 
   virtual void dump(std::ostream& os) const override;
+  static std::ostream& dump(std::ostream& os, const Elf64_timeval& time);
+  static std::ostream& dump(std::ostream& os, const Elf_siginfo& siginfo);
+  static std::ostream& dump(std::ostream& os, const reg_context_t& ctx);
 
   virtual void accept(Visitor& visitor) const override;
 

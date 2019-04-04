@@ -170,8 +170,71 @@ bool CorePrStatus::operator!=(const CorePrStatus& rhs) const {
 }
 
 void CorePrStatus::dump(std::ostream& os) const {
+  static constexpr size_t WIDTH = 14;
   os << std::left;
+
+  os << std::setw(WIDTH) << std::setfill(' ') << "Siginfo: "<< std::dec;
+    dump(os, this->siginfo());
+  os << std::endl;
+
+  os << std::setw(WIDTH) << std::setfill(' ') << "Current Signal: "<< std::dec
+     << this->current_sig() << std::endl;
+
+  os << std::setw(WIDTH) << std::setfill(' ') << "Pending signal: "<< std::dec
+     << this->sigpend() << std::endl;
+
+  os << std::setw(WIDTH) << std::setfill(' ') << "Signal held: "<< std::dec
+     << this->sighold() << std::endl;
+
+  os << std::setw(WIDTH) << std::setfill(' ') << "PID: "<< std::dec
+     << this->pid() << std::endl;
+
+  os << std::setw(WIDTH) << std::setfill(' ') << "PPID: "<< std::dec
+     << this->ppid() << std::endl;
+
+  os << std::setw(WIDTH) << std::setfill(' ') << "PGRP: "<< std::dec
+     << this->pgrp() << std::endl;
+
+  os << std::setw(WIDTH) << std::setfill(' ') << "SID: "<< std::dec
+     << this->sid() << std::endl;
+
+  os << std::setw(WIDTH) << std::setfill(' ') << "utime: "<< std::dec;
+    dump(os, this->utime());
+  os << std::endl;
+
+  os << std::setw(WIDTH) << std::setfill(' ') << "stime: "<< std::dec;
+    dump(os, this->stime());
+  os << std::endl;
+
+  os << std::setw(WIDTH) << std::setfill(' ') << "cutime: "<< std::dec;
+    dump(os, this->cutime());
+  os << std::endl;
+
+  os << std::setw(WIDTH) << std::setfill(' ') << "cstime: "<< std::dec;
+    dump(os, this->cstime());
+  os << std::endl;
+
+  os << std::setw(WIDTH) << std::setfill(' ') << "Registers: "<< std::dec;
+    dump(os, this->reg_context());
+  os << std::endl;
+
 }
+
+std::ostream& CorePrStatus::dump(std::ostream& os, const Elf64_timeval& time) {
+  os << std::dec;
+  os << time.tv_sec << ":" << time.tv_usec;
+  return os;
+}
+
+std::ostream& CorePrStatus::dump(std::ostream& os, const Elf_siginfo& siginfo) {
+  return os;
+}
+
+std::ostream& CorePrStatus::dump(std::ostream& os, const reg_context_t& ctx) {
+  return os;
+}
+
+
 
 void CorePrStatus::parse(void) {
   if (this->binary()->type() == ELF_CLASS::ELFCLASS64) {
@@ -193,6 +256,8 @@ std::ostream& operator<<(std::ostream& os, const CorePrStatus& note) {
   note.dump(os);
   return os;
 }
+
+
 
 CorePrStatus::~CorePrStatus(void) = default;
 

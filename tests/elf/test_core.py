@@ -24,91 +24,44 @@ class TestCore(TestCase):
     def setUp(self):
         self.logger = logging.getLogger(__name__)
 
-    def test_change_note(self):
-        _, output = tempfile.mkstemp(prefix="change_note_")
+    def test_core(self):
+        core = lief.parse(get_sample('ELF/ELF32_ARM_core_hello.core'))
 
-        etterlog = lief.parse(get_sample('ELF/ELF64_x86-64_binary_etterlog.bin'))
-        build_id = etterlog[lief.ELF.NOTE_TYPES.BUILD_ID]
+        notes = core.notes
 
-        new_desc = [i & 0xFF for i in range(500)]
-        build_id.description = new_desc
+        self.assertEqual(len(notes), 6)
 
-        etterlog.write(output)
+        # Check NT_PRPSINFO
+        # =================
+        prpsinfo = notes[0]
 
-        etterlog_updated = lief.parse(output)
+        self.assertTrue(prpsinfo.is_core)
+        self.assertEqual(prpsinfo.type_core, lief.ELF.NOTE_TYPES_CORE.PRPSINFO)
 
-        self.assertEqual(etterlog[lief.ELF.NOTE_TYPES.BUILD_ID], etterlog_updated[lief.ELF.NOTE_TYPES.BUILD_ID])
-        self.safe_delete(output)
+        # Check details
+        details = prpsinfo.details
+        self.assertIsInstance(details, lief.ELF.CorePrPsInfo)
+        self.assertEqual(details.file_name, "hello-exe")
+        self.assertEqual(details.uid,  2000)
+        self.assertEqual(details.gid,  2000)
+        self.assertEqual(details.pid,  8166)
+        self.assertEqual(details.ppid, 8163)
+        self.assertEqual(details.pgrp, 8166)
+        self.assertEqual(details.sid,  7997)
 
+        # Check NT_PRSTATUS
+        # =================
+        prstatus = notes[1]
+        print(prstatus)
 
-    def test_remove_note(self):
-        _, output = tempfile.mkstemp(prefix="remove_note_")
-        self.logger.info("Output will be: {}".format(output))
+        self.assertTrue(prstatus.is_core)
+        self.assertEqual(prstatus.type_core, lief.ELF.NOTE_TYPES_CORE.PRSTATUS)
 
-        etterlog = lief.parse(get_sample('ELF/ELF64_x86-64_binary_etterlog.bin'))
+        arm_vfp  = notes[2]
+        siginfo  = notes[3]
+        auxv     = notes[4]
+        files    = notes[5]
 
-        build_id = etterlog[lief.ELF.NOTE_TYPES.BUILD_ID]
-
-        etterlog -= build_id
-
-        etterlog.write(output)
-
-        etterlog_updated = lief.parse(output)
-
-        self.assertNotIn(lief.ELF.NOTE_TYPES.BUILD_ID, etterlog_updated)
-
-        self.safe_delete(output)
-
-    def test_add_note(self):
-        _, output = tempfile.mkstemp(prefix="add_note_")
-        self.logger.info("Output will be: {}".format(output))
-
-        etterlog = lief.parse(get_sample('ELF/ELF64_x86-64_binary_etterlog.bin'))
-        note = lief.ELF.Note("Foo", lief.ELF.NOTE_TYPES.GOLD_VERSION, [123])
-
-        etterlog += note
-
-        etterlog.write(output)
-
-        etterlog_updated = lief.parse(output)
-
-        self.assertIn(lief.ELF.NOTE_TYPES.GOLD_VERSION, etterlog_updated)
-
-        self.safe_delete(output)
-
-
-    def test_android_note(self):
-        _, output = tempfile.mkstemp(prefix="android_note_")
-        self.logger.info("Output will be: {}".format(output))
-
-        ndkr16 = lief.parse(get_sample('ELF/ELF64_AArch64_piebinary_ndkr16.bin'))
-        note = ndkr16.get(lief.ELF.NOTE_TYPES.ABI_TAG)
-        details = note.details
-        self.assertEqual(details.sdk_version, 21)
-        self.assertEqual(details.ndk_version[:4], "r16b")
-        self.assertEqual(details.ndk_build_number[:7], "4479499")
-
-        details.sdk_version = 15
-        details.ndk_version = "r15c"
-        details.ndk_build_number = "123456"
-
-        note = ndkr16.get(lief.ELF.NOTE_TYPES.ABI_TAG).details
-
-        self.assertEqual(note.sdk_version, 15)
-        self.assertEqual(note.ndk_version[:4], "r15c")
-        self.assertEqual(note.ndk_build_number[:6], "123456")
-
-        ndkr16.write(output)
-
-        ndkr15 = lief.parse(output)
-
-        note = ndkr15.get(lief.ELF.NOTE_TYPES.ABI_TAG).details
-
-        self.assertEqual(note.sdk_version, 15)
-        self.assertEqual(note.ndk_version[:4], "r15c")
-        self.assertEqual(note.ndk_build_number[:6], "123456")
-
-        self.safe_delete(output)
 
 
 if __name__ == '__main__':

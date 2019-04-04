@@ -135,6 +135,9 @@ void CorePrPsInfo::dump(std::ostream& os) const {
   os << std::setw(12) << std::setfill(' ') << "UID: " << std::dec << this->uid() << std::endl;
   os << std::setw(12) << std::setfill(' ') << "GID: " << std::dec << this->gid() << std::endl;
   os << std::setw(12) << std::setfill(' ') << "PID: " << std::dec << this->pid() << std::endl;
+  os << std::setw(12) << std::setfill(' ') << "PPID: " << std::dec << this->ppid() << std::endl;
+  os << std::setw(12) << std::setfill(' ') << "PGRP: " << std::dec << this->pgrp() << std::endl;
+  os << std::setw(12) << std::setfill(' ') << "SID: " << std::dec << this->sid() << std::endl;
 }
 
 void CorePrPsInfo::parse(void) {
