@@ -229,7 +229,35 @@ void Hash::visit(const CorePrPsInfo& pinfo) {
   process(pinfo.sid());
 }
 
-void Hash::visit(const CorePrStatus& pinfo) {
+void Hash::visit(const CorePrStatus& pstatus) {
+  process(pstatus.siginfo().si_code);
+  process(pstatus.siginfo().si_errno);
+  process(pstatus.siginfo().si_signo);
+
+  process(pstatus.current_sig());
+  process(pstatus.sigpend());
+  process(pstatus.sighold());
+  process(pstatus.pid());
+  process(pstatus.ppid());
+  process(pstatus.pgrp());
+  process(pstatus.sid());
+
+  process(pstatus.utime().tv_sec);
+  process(pstatus.utime().tv_usec);
+
+  process(pstatus.stime().tv_sec);
+  process(pstatus.stime().tv_usec);
+
+  process(pstatus.cutime().tv_sec);
+  process(pstatus.cutime().tv_usec);
+
+  process(pstatus.cstime().tv_sec);
+  process(pstatus.cstime().tv_usec);
+
+  for (const CorePrStatus::reg_context_t::value_type& val : pstatus.reg_context()) {
+    this->process(val.first);  // Register
+    this->process(val.second); // Value
+  }
 }
 
 void Hash::visit(const CoreFile& file) {

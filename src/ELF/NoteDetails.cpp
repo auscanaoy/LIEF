@@ -60,6 +60,11 @@ Note::description_t& NoteDetails::description(void) {
 
 
 Binary* NoteDetails::binary(void) {
+  return const_cast<Binary*>(static_cast<const NoteDetails*>(this)->binary());
+}
+
+
+const Binary* NoteDetails::binary(void) const {
   if (this->note_ == nullptr) {
     return nullptr;
   }

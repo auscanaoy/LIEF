@@ -42,7 +42,7 @@ void create<CorePrStatus>(py::module& m) {
   py::class_<CorePrStatus, NoteDetails> cls(m, "CorePrStatus");
 
   py::class_<Elf64_timeval>(cls, "timeval")
-    .def_readwrite("sec", &Elf64_timeval::tv_sec)
+    .def_readwrite("sec",  &Elf64_timeval::tv_sec)
     .def_readwrite("usec", &Elf64_timeval::tv_usec);
 
   py::class_<Elf_siginfo>(cls, "siginfo")
@@ -54,61 +54,109 @@ void create<CorePrStatus>(py::module& m) {
     .def_property("siginfo",
         static_cast<getter_t<const Elf_siginfo&>>(&CorePrStatus::siginfo),
         static_cast<setter_t<const Elf_siginfo&>>(&CorePrStatus::siginfo),
-        "")
+        "Info associated with the signal")
 
     .def_property("current_sig",
         static_cast<getter_t<uint16_t>>(&CorePrStatus::current_sig),
         static_cast<setter_t<uint16_t>>(&CorePrStatus::current_sig),
-        "")
+        "Current Signal")
 
     .def_property("sigpend",
         static_cast<getter_t<uint64_t>>(&CorePrStatus::sigpend),
         static_cast<setter_t<uint64_t>>(&CorePrStatus::sigpend),
-        "")
+        "Set of pending signals")
 
     .def_property("sighold",
         static_cast<getter_t<uint64_t>>(&CorePrStatus::sighold),
         static_cast<setter_t<uint64_t>>(&CorePrStatus::sighold),
-        "")
+        "Set of held signals")
 
     .def_property("pid",
         static_cast<getter_t<int32_t>>(&CorePrStatus::pid),
         static_cast<setter_t<int32_t>>(&CorePrStatus::pid),
-        "")
+        "Process ID")
+
+    .def_property("ppid",
+        static_cast<getter_t<int32_t>>(&CorePrStatus::ppid),
+        static_cast<setter_t<int32_t>>(&CorePrStatus::ppid),
+        "Process parent ID")
 
     .def_property("pgrp",
         static_cast<getter_t<int32_t>>(&CorePrStatus::pgrp),
         static_cast<setter_t<int32_t>>(&CorePrStatus::pgrp),
-        "")
+        "Process group ID")
 
     .def_property("sid",
         static_cast<getter_t<int32_t>>(&CorePrStatus::sid),
         static_cast<setter_t<int32_t>>(&CorePrStatus::sid),
-        "")
+        "Process session ID")
 
     .def_property("utime",
         static_cast<getter_t<Elf64_timeval>>(&CorePrStatus::utime),
         static_cast<setter_t<Elf64_timeval>>(&CorePrStatus::utime),
-        "")
+        "User time (" RST_CLASS_REF(lief.ELF.CorePrStatus.timeval) ")")
 
     .def_property("utime",
         static_cast<getter_t<Elf64_timeval>>(&CorePrStatus::utime),
         static_cast<setter_t<Elf64_timeval>>(&CorePrStatus::utime),
-        "")
+        "User time (" RST_CLASS_REF(lief.ELF.CorePrStatus.timeval) ")")
 
     .def_property("stime",
         static_cast<getter_t<Elf64_timeval>>(&CorePrStatus::stime),
         static_cast<setter_t<Elf64_timeval>>(&CorePrStatus::stime),
-        "")
+        "System time (" RST_CLASS_REF(lief.ELF.CorePrStatus.timeval) ")")
 
     .def_property("cutime",
         static_cast<getter_t<Elf64_timeval>>(&CorePrStatus::cutime),
         static_cast<setter_t<Elf64_timeval>>(&CorePrStatus::cutime),
-        "")
+        "Cumulative user time (" RST_CLASS_REF(lief.ELF.CorePrStatus.timeval) ")")
 
     .def_property("cstime",
         static_cast<getter_t<Elf64_timeval>>(&CorePrStatus::cstime),
         static_cast<setter_t<Elf64_timeval>>(&CorePrStatus::cstime),
+        "Cumulative system time (" RST_CLASS_REF(lief.ELF.CorePrStatus.timeval) ")")
+
+    .def_property("register_context",
+        static_cast<getter_t<const CorePrStatus::reg_context_t&>>(&CorePrStatus::reg_context),
+        static_cast<setter_t<const CorePrStatus::reg_context_t&>>(&CorePrStatus::reg_context),
+        "Current registers state as a dictionarry whose keys are "
+        RST_CLASS_REF(lief.ELF.CorePrStatus.REGISTERS) " and the values the register's value")
+
+    .def("get",
+        [] (const CorePrStatus& status, CorePrStatus::REGISTERS reg) -> py::object {
+          bool error;
+          uint64_t val = status.get(reg, &error);
+          if (error) {
+            return py::none();
+          }
+          return py::int_(val);
+        },
+        "Return the register value",
+        "register"_a)
+
+    .def("set",
+        &CorePrStatus::set,
+        "Set register value",
+        "register"_a, "value"_a)
+
+    .def("has",
+        &CorePrStatus::has,
+        "Check if a value is associated with the given register",
+        "register"_a)
+
+    .def("__getitem__",
+        &CorePrStatus::operator[],
+        "",
+        py::return_value_policy::copy)
+
+    .def("__setitem__",
+        [] (CorePrStatus& status, CorePrStatus::REGISTERS reg, uint64_t val) {
+          status.set(reg, val);
+        },
+        "")
+
+    .def("__contains__",
+        &CorePrStatus::has,
         "")
 
     .def("__eq__", &CorePrStatus::operator==)
@@ -187,6 +235,7 @@ void create<CorePrStatus>(py::module& m) {
     .value(PY_ENUM(CorePrStatus::REGISTERS::ARM_R13))
     .value(PY_ENUM(CorePrStatus::REGISTERS::ARM_R14))
     .value(PY_ENUM(CorePrStatus::REGISTERS::ARM_R15))
+    .value(PY_ENUM(CorePrStatus::REGISTERS::ARM_CPSR))
 
     .value(PY_ENUM(CorePrStatus::REGISTERS::AARCH64_X0))
     .value(PY_ENUM(CorePrStatus::REGISTERS::AARCH64_X1))

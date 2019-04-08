@@ -324,6 +324,7 @@ struct Elf64_timeval {
 struct Elf32_Prstatus {
   Elf_siginfo   pr_info;
   uint16_t      pr_cursig;
+  uint16_t      reserved;
 
   uint32_t      pr_sigpend;
   uint32_t      pr_sighold;
@@ -342,6 +343,7 @@ struct Elf32_Prstatus {
 struct Elf64_Prstatus {
   Elf_siginfo   pr_info;
   uint16_t      pr_cursig;
+  uint16_t      reserved;
 
   uint64_t      pr_sigpend;
   uint64_t      pr_sighold;

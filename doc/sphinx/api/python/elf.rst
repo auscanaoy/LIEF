@@ -233,6 +233,16 @@ Core PrPsInfo
 
 ----------
 
+Core PrStatus
+*************
+
+.. autoclass:: lief.ELF.CorePrStatus
+  :members:
+  :inherited-members:
+  :undoc-members:
+
+----------
+
 Android Note
 *************
 

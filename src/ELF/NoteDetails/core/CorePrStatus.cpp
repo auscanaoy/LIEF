@@ -20,6 +20,8 @@
 #include "LIEF/ELF/hash.hpp"
 #include "LIEF/ELF/EnumToString.hpp"
 
+#include "LIEF/logging++.hpp"
+
 #include "CorePrStatus.tcc"
 
 namespace LIEF {
@@ -90,69 +92,158 @@ Elf64_timeval CorePrStatus::cstime(void) const {
 }
 
 
+uint64_t CorePrStatus::get(CorePrStatus::REGISTERS reg, bool* error) const {
+  if (not this->has(reg)) {
+    if (error != nullptr) {
+      *error = true;
+    }
+    return 0;
+  }
+
+  if (error != nullptr) {
+    *error = false;
+  }
+  return this->ctx_.at(reg);
+}
+
+bool CorePrStatus::has(CorePrStatus::REGISTERS reg) const {
+  return this->ctx_.find(reg) != std::end(this->ctx_);
+}
+
+
+uint64_t CorePrStatus::pc(void) const {
+  const ARCH arch = this->binary()->header().machine_type();
+  switch (arch) {
+    case ARCH::EM_386:
+      {
+        return this->get(REGISTERS::X86_EIP);
+      }
+
+    case ARCH::EM_X86_64:
+      {
+        return this->get(REGISTERS::X86_64_RIP);
+      }
+
+    case ARCH::EM_ARM:
+      {
+        return this->get(REGISTERS::ARM_R15);
+      }
+
+    case ARCH::EM_AARCH64:
+      {
+        return this->get(REGISTERS::AARCH64_PC);
+      }
+
+    default:
+      {
+        LOG(WARNING) << to_string(arch) << " not supported";
+        return 0;
+      }
+  }
+}
+
+uint64_t CorePrStatus::sp(void) const {
+  const ARCH arch = this->binary()->header().machine_type();
+  switch (arch) {
+    case ARCH::EM_386:
+      {
+        return this->get(REGISTERS::X86_ESP);
+      }
+
+    case ARCH::EM_X86_64:
+      {
+        return this->get(REGISTERS::X86_64_RSP);
+      }
+
+    case ARCH::EM_ARM:
+      {
+        return this->get(REGISTERS::ARM_R13);
+      }
+
+    case ARCH::EM_AARCH64:
+      {
+        return this->get(REGISTERS::AARCH64_X31);
+      }
+
+    default:
+      {
+        LOG(WARNING) << to_string(arch) << " not supported";
+        return 0;
+      }
+  }
+
+}
+
+
 void CorePrStatus::siginfo(const Elf_siginfo& siginfo) {
   this->siginfo_ = siginfo;
-  this->parse();
+  this->build();
 }
 
 void CorePrStatus::current_sig(uint16_t current_sig) {
   this->cursig_ = current_sig;
-  this->parse();
+  this->build();
 }
 
 void CorePrStatus::sigpend(uint64_t sigpend) {
   this->sigpend_ = sigpend;
-  this->parse();
+  this->build();
 }
 
 void CorePrStatus::sighold(uint64_t sighold) {
   this->sighold_ = sighold;
-  this->parse();
+  this->build();
 }
 
 void CorePrStatus::pid(int32_t pid) {
   this->pid_ = pid;
-  this->parse();
+  this->build();
 }
 
 void CorePrStatus::ppid(int32_t ppid) {
   this->ppid_ = ppid;
-  this->parse();
+  this->build();
 }
 
 void CorePrStatus::pgrp(int32_t pgrp) {
   this->pgrp_ = pgrp;
-  this->parse();
+  this->build();
 }
 
 void CorePrStatus::sid(int32_t sid) {
   this->sid_ = sid;
-  this->parse();
+  this->build();
 }
 
 void CorePrStatus::utime(Elf64_timeval utime) {
   this->utime_ = utime;
-  this->parse();
+  this->build();
 }
 
 void CorePrStatus::stime(Elf64_timeval stime) {
   this->stime_ = stime;
-  this->parse();
+  this->build();
 }
 
 void CorePrStatus::cutime(Elf64_timeval cutime) {
   this->cutime_ = cutime;
-  this->parse();
+  this->build();
 }
 
 void CorePrStatus::cstime(Elf64_timeval cstime) {
   this->cstime_ = cstime;
-  this->parse();
+  this->build();
 }
 
 void CorePrStatus::reg_context(const reg_context_t& ctx) {
   this->ctx_ = ctx;
-  this->parse();
+  this->build();
+}
+
+bool CorePrStatus::set(REGISTERS reg, uint64_t value) {
+  this->ctx_[reg] = value;
+  this->build();
+  return true;
 }
 
 void CorePrStatus::accept(Visitor& visitor) const {
@@ -169,8 +260,12 @@ bool CorePrStatus::operator!=(const CorePrStatus& rhs) const {
   return not (*this == rhs);
 }
 
+uint64_t& CorePrStatus::operator[](REGISTERS reg) {
+  return this->ctx_[reg];
+}
+
 void CorePrStatus::dump(std::ostream& os) const {
-  static constexpr size_t WIDTH = 14;
+  static constexpr size_t WIDTH = 16;
   os << std::left;
 
   os << std::setw(WIDTH) << std::setfill(' ') << "Siginfo: "<< std::dec;
@@ -214,7 +309,7 @@ void CorePrStatus::dump(std::ostream& os) const {
     dump(os, this->cstime());
   os << std::endl;
 
-  os << std::setw(WIDTH) << std::setfill(' ') << "Registers: "<< std::dec;
+  os << std::setw(WIDTH) << std::setfill(' ') << "Registers: "<< std::dec << std::endl;
     dump(os, this->reg_context());
   os << std::endl;
 
@@ -227,13 +322,18 @@ std::ostream& CorePrStatus::dump(std::ostream& os, const Elf64_timeval& time) {
 }
 
 std::ostream& CorePrStatus::dump(std::ostream& os, const Elf_siginfo& siginfo) {
+  os << std::dec;
+  os << siginfo.si_signo << " - " << siginfo.si_code << " - " << siginfo.si_errno;
   return os;
 }
 
 std::ostream& CorePrStatus::dump(std::ostream& os, const reg_context_t& ctx) {
+
+  for (auto&& reg_val : ctx) {
+    os << std::setw(14) << std::setfill(' ') << to_string(reg_val.first) << ": " << std::hex << std::showbase << reg_val.second << std::endl;
+  }
   return os;
 }
-
 
 
 void CorePrStatus::parse(void) {
@@ -250,6 +350,50 @@ void CorePrStatus::build(void) {
   } else if (this->binary()->type() == ELF_CLASS::ELFCLASS32) {
     this->build_<ELF32>();
   }
+}
+
+
+std::pair<size_t, size_t> CorePrStatus::reg_enum_range(void) const {
+  const ARCH arch = this->binary()->header().machine_type();
+
+  size_t enum_start = 0;
+  size_t enum_end   = 0;
+
+  switch (arch) {
+    case ARCH::EM_386:
+      {
+        enum_start = static_cast<size_t>(REGISTERS::X86_START) + 1;
+        enum_end  = static_cast<size_t>(REGISTERS::X86_END);
+        break;
+      }
+
+    case ARCH::EM_X86_64:
+      {
+        enum_start = static_cast<size_t>(REGISTERS::X86_64_START) + 1;
+        enum_end  = static_cast<size_t>(REGISTERS::X86_64_END);
+        break;
+      }
+
+    case ARCH::EM_ARM:
+      {
+        enum_start = static_cast<size_t>(REGISTERS::ARM_START) + 1;
+        enum_end  = static_cast<size_t>(REGISTERS::ARM_END);
+        break;
+      }
+
+    case ARCH::EM_AARCH64:
+      {
+        enum_start = static_cast<size_t>(REGISTERS::AARCH64_START) + 1;
+        enum_end  = static_cast<size_t>(REGISTERS::AARCH64_END);
+        break;
+      }
+
+    default:
+      {
+        LOG(WARNING) << to_string(arch) << " not supported";
+      }
+  }
+  return {enum_start, enum_end};
 }
 
 std::ostream& operator<<(std::ostream& os, const CorePrStatus& note) {

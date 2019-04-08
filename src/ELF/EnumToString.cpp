@@ -1354,7 +1354,7 @@ const char* to_string(ELF_SYMBOL_VISIBILITY e) {
 
 
 const char* to_string(CorePrStatus::REGISTERS e) {
-  CONST_MAP(CorePrStatus::REGISTERS, const char*, 89) enum_strings {
+  CONST_MAP(CorePrStatus::REGISTERS, const char*, 90) enum_strings {
     { CorePrStatus::REGISTERS::UNKNOWN,     "UNKNOWN"   },
 
     // X86
@@ -1416,6 +1416,7 @@ const char* to_string(CorePrStatus::REGISTERS e) {
     { CorePrStatus::REGISTERS::ARM_R13, "ARM_R13" },
     { CorePrStatus::REGISTERS::ARM_R14, "ARM_R14" },
     { CorePrStatus::REGISTERS::ARM_R15, "ARM_R15" },
+    { CorePrStatus::REGISTERS::ARM_CPSR, "ARM_CPSR" },
 
     { CorePrStatus::REGISTERS::AARCH64_X0,  "AARCH64_X0"   },
     { CorePrStatus::REGISTERS::AARCH64_X1,  "AARCH64_X1"   },

@@ -64,6 +64,7 @@ class LIEF_API NoteDetails : public Object {
 
   Note::description_t& description(void);
   Binary* binary(void);
+  const Binary* binary(void) const;
 
   private:
   Note*                note_;

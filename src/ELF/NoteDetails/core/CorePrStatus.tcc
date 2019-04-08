@@ -21,9 +21,6 @@
 
 #include "LIEF/ELF/NoteDetails/core/CorePrStatus.hpp"
 
-#include "LIEF/logging++.hpp"
-
-
 namespace LIEF {
 namespace ELF {
 
@@ -39,7 +36,7 @@ void CorePrStatus::parse_(void) {
   auto&& status = reinterpret_cast<const Elf_Prstatus*>(description.data());
 
   this->siginfo_ = status->pr_info;
-  this->cursig_ = status->pr_cursig;
+  this->cursig_  = status->pr_cursig;
 
   this->sigpend_ = status->pr_sigpend;
   this->sighold_ = status->pr_sighold;
@@ -49,11 +46,11 @@ void CorePrStatus::parse_(void) {
   this->pgrp_ = status->pr_pgrp;
   this->sid_  = status->pr_sid;
 
-  this->utime_.tv_sec  = status->pr_utime.tv_sec;
-  this->utime_.tv_usec = status->pr_utime.tv_usec;
+  this->utime_.tv_sec   = status->pr_utime.tv_sec;
+  this->utime_.tv_usec  = status->pr_utime.tv_usec;
 
-  this->stime_.tv_sec  = status->pr_stime.tv_sec;
-  this->stime_.tv_usec = status->pr_stime.tv_usec;
+  this->stime_.tv_sec   = status->pr_stime.tv_sec;
+  this->stime_.tv_usec  = status->pr_stime.tv_usec;
 
   this->cutime_.tv_sec  = status->pr_cutime.tv_sec;
   this->cutime_.tv_usec = status->pr_cutime.tv_usec;
@@ -61,51 +58,12 @@ void CorePrStatus::parse_(void) {
   this->cstime_.tv_sec  = status->pr_cstime.tv_sec;
   this->cstime_.tv_usec = status->pr_cstime.tv_usec;
 
-  if (this->binary() == nullptr) {
-    return;
-  }
-  const ARCH arch = this->binary()->header().machine_type();
-
   size_t enum_start = 0;
   size_t enum_end   = 0;
-  switch (arch) {
-    case ARCH::EM_386:
-      {
-        enum_start = static_cast<size_t>(REGISTERS::X86_START) + 1;
-        enum_end  = static_cast<size_t>(REGISTERS::X86_END);
-        break;
-      }
-
-    case ARCH::EM_X86_64:
-      {
-        enum_start = static_cast<size_t>(REGISTERS::X86_64_START) + 1;
-        enum_end  = static_cast<size_t>(REGISTERS::X86_64_END);
-        break;
-      }
-
-    case ARCH::EM_ARM:
-      {
-        enum_start = static_cast<size_t>(REGISTERS::ARM_START) + 1;
-        enum_end  = static_cast<size_t>(REGISTERS::ARM_END);
-        break;
-      }
-
-    case ARCH::EM_AARCH64:
-      {
-        enum_start = static_cast<size_t>(REGISTERS::AARCH64_START) + 1;
-        enum_end  = static_cast<size_t>(REGISTERS::AARCH64_END);
-        break;
-      }
-
-    default:
-      {
-        LOG(WARNING) << to_string(arch) << " not supported";
-      }
-  }
-
+  std::tie(enum_start, enum_end) = this->reg_enum_range();
 
   const VectorStream& stream(description);
-  stream.setpos(sizeof(Elf_Prstatus) + /* Padding */ 2);
+  stream.setpos(sizeof(Elf_Prstatus));
 
   for (size_t i = enum_start; i < enum_end; ++i) {
     if (not stream.can_read<uint__>()) {
@@ -120,6 +78,58 @@ void CorePrStatus::parse_(void) {
 
 template <typename ELF_T>
 void CorePrStatus::build_(void) {
+  using Elf_Prstatus  = typename ELF_T::Elf_Prstatus;
+  using uint__        = typename ELF_T::uint;
+
+  Note::description_t& description = this->description();
+  Elf_Prstatus status;
+
+  status.pr_info.si_signo  = static_cast<int32_t>(this->siginfo_.si_signo);
+  status.pr_info.si_code   = static_cast<int32_t>(this->siginfo_.si_code);
+  status.pr_info.si_errno  = static_cast<int32_t>(this->siginfo_.si_errno);
+
+  status.pr_cursig         = static_cast<uint16_t>(this->cursig_);
+  status.reserved          = static_cast<uint16_t>(0xFE19);
+
+  status.pr_sigpend        = static_cast<uint__>(this->sigpend_);
+  status.pr_sighold        = static_cast<uint__>(this->sighold_);
+
+  status.pr_pid            = static_cast<int32_t>(this->pid_);
+  status.pr_ppid           = static_cast<int32_t>(this->ppid_);
+  status.pr_pgrp           = static_cast<int32_t>(this->pgrp_);
+  status.pr_sid            = static_cast<int32_t>(this->sid_);
+
+  status.pr_utime.tv_sec   = static_cast<uint__>(this->utime_.tv_sec);
+  status.pr_utime.tv_usec  = static_cast<uint__>(this->utime_.tv_usec);
+
+  status.pr_stime.tv_sec   = static_cast<uint__>(this->stime_.tv_sec);
+  status.pr_stime.tv_usec  = static_cast<uint__>(this->stime_.tv_usec);
+
+  status.pr_cutime.tv_sec  = static_cast<uint__>(this->cutime_.tv_sec);
+  status.pr_cutime.tv_usec = static_cast<uint__>(this->cutime_.tv_usec);
+
+  status.pr_cstime.tv_sec  = static_cast<uint__>(this->cstime_.tv_sec);
+  status.pr_cstime.tv_usec = static_cast<uint__>(this->cstime_.tv_usec);
+
+  vector_iostream raw_output;
+  size_t desc_part_size = sizeof(Elf_Prstatus);
+  raw_output.reserve(desc_part_size);
+  raw_output.write(reinterpret_cast<const uint8_t*>(&status), sizeof(Elf_Prstatus));
+
+  size_t enum_start = 0;
+  size_t enum_end = 0;
+  std::tie(enum_start, enum_end) = this->reg_enum_range();
+
+  for (size_t i = enum_start; i < enum_end; ++i) {
+    REGISTERS reg = static_cast<REGISTERS>(i);
+    auto val = static_cast<uint__>(this->get(reg));
+    raw_output.write_conv(val);
+  }
+
+  std::vector<uint8_t> raw = raw_output.raw();
+  std::copy(std::begin(raw), std::end(raw),
+      std::begin(description));
+
 }
 
 } // namespace ELF

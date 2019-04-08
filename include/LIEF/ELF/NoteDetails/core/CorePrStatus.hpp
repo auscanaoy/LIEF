@@ -19,6 +19,7 @@
 #include <vector>
 #include <iostream>
 #include <map>
+#include <utility>
 
 #include "LIEF/Object.hpp"
 #include "LIEF/visibility.h"
@@ -62,6 +63,7 @@ class LIEF_API CorePrStatus : public NoteDetails {
     ARM_START,
       ARM_R0, ARM_R1, ARM_R2,  ARM_R3,  ARM_R4,  ARM_R5,  ARM_R6,  ARM_R7,
       ARM_R8, ARM_R9, ARM_R10, ARM_R11, ARM_R12, ARM_R13, ARM_R14, ARM_R15,
+      ARM_CPSR,
     ARM_END,
 
     // AArch64
@@ -79,7 +81,7 @@ class LIEF_API CorePrStatus : public NoteDetails {
   public:
   static CorePrStatus make(Note& note);
 
-  //! Info associated with signal
+  //! Info associated with the signal
   const Elf_siginfo& siginfo(void) const;
 
   //! Current Signal
@@ -118,6 +120,20 @@ class LIEF_API CorePrStatus : public NoteDetails {
   //! GP registers state
   const reg_context_t& reg_context(void) const;
 
+  //! Return the program counter
+  uint64_t pc(void) const;
+
+  //! Return the stack pointer
+  uint64_t sp(void) const;
+
+  //! Get register value. If ``error`` is set,
+  //! this function and the register exists, the function set the boolean value to ``false``
+  //! Otherwise it set the value to ``true``
+  uint64_t get(REGISTERS reg, bool* error = nullptr) const;
+
+  //! Check if the given register is present in the info
+  bool has(REGISTERS reg) const;
+
   void siginfo(const Elf_siginfo& siginfo);
   void current_sig(uint16_t current_sig);
 
@@ -136,8 +152,12 @@ class LIEF_API CorePrStatus : public NoteDetails {
 
   void reg_context(const reg_context_t& ctx);
 
+  bool set(REGISTERS reg, uint64_t value);
+
   bool operator==(const CorePrStatus& rhs) const;
   bool operator!=(const CorePrStatus& rhs) const;
+
+  uint64_t& operator[](REGISTERS reg);
 
   virtual void dump(std::ostream& os) const override;
   static std::ostream& dump(std::ostream& os, const Elf64_timeval& time);
@@ -162,6 +182,8 @@ class LIEF_API CorePrStatus : public NoteDetails {
 
   private:
   CorePrStatus(Note& note);
+
+  std::pair<size_t, size_t> reg_enum_range(void) const;
 
   Elf_siginfo siginfo_;
   uint16_t    cursig_;

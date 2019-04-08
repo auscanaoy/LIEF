@@ -173,6 +173,14 @@ Core PrPsInfo
 
 ----------
 
+Core PrStatus
+*************
+
+.. doxygenclass:: LIEF::ELF::CorePrStatus
+   :project: lief
+
+----------
+
 Android Note
 ************
 

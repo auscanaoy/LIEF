@@ -426,7 +426,30 @@ void JsonVisitor::visit(const CorePrPsInfo& pinfo) {
 }
 
 
-void JsonVisitor::visit(const CorePrStatus& pinfo) {
+void JsonVisitor::visit(const CorePrStatus& pstatus) {
+  this->node_["current_sig"] = pstatus.current_sig();
+  this->node_["sigpend"]     = pstatus.sigpend();
+  this->node_["sighold"]     = pstatus.sighold();
+  this->node_["pid"]         = pstatus.pid();
+  this->node_["ppid"]        = pstatus.ppid();
+  this->node_["pgrp"]        = pstatus.pgrp();
+  this->node_["sid"]         = pstatus.sid();
+  this->node_["sigpend"]     = pstatus.sigpend();
+
+  this->node_["utime"] = {
+    {"tv_sec",  pstatus.utime().tv_sec},
+    {"tv_usec", pstatus.utime().tv_usec}
+  };
+
+  this->node_["stime"] = {
+    {"tv_sec",  pstatus.stime().tv_sec},
+    {"tv_usec", pstatus.stime().tv_usec}
+  };
+
+  this->node_["stime"] = {
+    {"tv_sec",  pstatus.stime().tv_sec},
+    {"tv_usec", pstatus.stime().tv_usec}
+  };
 }
 
 void JsonVisitor::visit(const CoreFile& file) {
