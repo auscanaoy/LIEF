@@ -1340,6 +1340,47 @@ const char* to_string(ELF_SEGMENT_FLAGS e) {
 }
 
 
+const char* to_string(AUX_TYPE e) {
+  CONST_MAP(AUX_TYPE, const char*, 32) enum_strings {
+    { AUX_TYPE::AT_NULL, "NULL" },
+    { AUX_TYPE::AT_IGNORE, "IGNORE" },
+    { AUX_TYPE::AT_EXECFD, "EXECFD" },
+    { AUX_TYPE::AT_PHDR, "PHDR" },
+    { AUX_TYPE::AT_PHENT, "PHENT" },
+    { AUX_TYPE::AT_PHNUM, "PHNUM" },
+    { AUX_TYPE::AT_PAGESZ, "PAGESZ" },
+    { AUX_TYPE::AT_BASE, "BASE" },
+    { AUX_TYPE::AT_FLAGS, "FLAGS" },
+    { AUX_TYPE::AT_ENTRY, "ENTRY" },
+    { AUX_TYPE::AT_NOTELF, "NOTELF" },
+    { AUX_TYPE::AT_UID, "UID" },
+    { AUX_TYPE::AT_EUID, "EUID" },
+    { AUX_TYPE::AT_GID, "GID" },
+    { AUX_TYPE::AT_EGID, "EGID" },
+    { AUX_TYPE::AT_CLKTCK, "CKLTCK" },
+    { AUX_TYPE::AT_PLATFORM, "PLATFORM" },
+    { AUX_TYPE::AT_HWCAP, "HWCAP" },
+    { AUX_TYPE::AT_HWCAP2, "HWCAP2" },
+    { AUX_TYPE::AT_FPUCW, "FPUCW" },
+    { AUX_TYPE::AT_DCACHEBSIZE, "DCACHEBSIZE" },
+    { AUX_TYPE::AT_ICACHEBSIZE, "ICACHEBSIZE" },
+    { AUX_TYPE::AT_UCACHEBSIZE, "UCACHEBSIZE" },
+    { AUX_TYPE::AT_IGNOREPPC, "IGNOREPPC" },
+    { AUX_TYPE::AT_SECURE, "SECURE" },
+    { AUX_TYPE::AT_BASE_PLATFORM, "BASE_PLATFORM" },
+    { AUX_TYPE::AT_RANDOM, "RANDOM" },
+    { AUX_TYPE::AT_EXECFN, "EXECFN" },
+    { AUX_TYPE::AT_SYSINFO, "SYSINFO" },
+    { AUX_TYPE::AT_SYSINFO_EHDR, "SYSINFO_EHDR" },
+    { AUX_TYPE::AT_L1I_CACHESHAPE, "L1I_CACHESHAPE" },
+    { AUX_TYPE::AT_L1D_CACHESHAPE, "L1D_CACHESHAPE" },
+  };
+
+  auto   it  = enum_strings.find(e);
+  return it == enum_strings.end() ? "UNDEFINED" : it->second;
+}
+
+
 const char* to_string(ELF_SYMBOL_VISIBILITY e) {
   CONST_MAP(ELF_SYMBOL_VISIBILITY, const char*, 4) enum_strings {
     { ELF_SYMBOL_VISIBILITY::STV_DEFAULT,   "DEFAULT"   },

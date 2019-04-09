@@ -867,6 +867,7 @@ enum _LIEF_EN(AUX_TYPE) {
    _LIEF_EI(AT_SECURE)        = 23,    /**< Boolean, was exec setuid-like?  */
    _LIEF_EI(AT_BASE_PLATFORM) = 24,    /**< String identifying real platforms.*/
    _LIEF_EI(AT_RANDOM)        = 25,    /**< Address of 16 random bytes.  */
+   _LIEF_EI(AT_HWCAP2)        = 26,    /**< Extension of AT_HWCAP.  */
    _LIEF_EI(AT_EXECFN)        = 31,    /**< Filename of executable.  */
 
    /* Pointer to the global system page used for system calls and other

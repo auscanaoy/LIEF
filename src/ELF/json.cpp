@@ -450,6 +450,19 @@ void JsonVisitor::visit(const CorePrStatus& pstatus) {
     {"tv_sec",  pstatus.stime().tv_sec},
     {"tv_usec", pstatus.stime().tv_usec}
   };
+
+  json regs;
+  for (const CorePrStatus::reg_context_t::value_type& val : pstatus.reg_context()) {
+    regs[to_string(val.first)] = val.second;
+  };
+  this->node_["regs"] = regs;
+}
+
+void JsonVisitor::visit(const CoreAuxv& auxv) {
+  std::vector<json> values;
+  for (const CoreAuxv::val_context_t::value_type& val : auxv.values()) {
+    this->node_[to_string(val.first)] = val.second;
+  }
 }
 
 void JsonVisitor::visit(const CoreFile& file) {

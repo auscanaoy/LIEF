@@ -18,6 +18,7 @@
 
 #include "LIEF/ELF/NoteDetails/core/CorePrPsInfo.hpp"
 #include "LIEF/ELF/NoteDetails/core/CorePrStatus.hpp"
+#include "LIEF/ELF/NoteDetails/core/CoreAuxv.hpp"
 #include "LIEF/ELF/NoteDetails/core/CoreFile.hpp"
 
 #endif

@@ -62,6 +62,7 @@ void init_objects(py::module& m) {
   CREATE(CoreFile, m);
   CREATE(CoreFileEntry, m);
   CREATE(CorePrStatus, m);
+  CREATE(CoreAuxv, m);
 }
 
 }

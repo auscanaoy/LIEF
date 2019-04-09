@@ -155,6 +155,12 @@ NoteDetails& Note::details(void) {
           break;
         }
 
+      case NOTE_TYPES_CORE::NT_AUXV:
+        {
+          details.reset(new CoreAuxv{CoreAuxv::make(*this)});
+          break;
+        }
+
       default:
         break;
     }

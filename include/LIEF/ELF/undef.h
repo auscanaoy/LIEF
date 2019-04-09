@@ -1577,6 +1577,7 @@
 
 #undef AT_PLATFORM
 #undef AT_HWCAP
+#undef AT_HWCAP2
 #undef AT_FPUCW
 #undef AT_DCACHEBSIZE
 #undef AT_ICACHEBSIZE

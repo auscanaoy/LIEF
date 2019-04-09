@@ -102,7 +102,36 @@ class TestCore(TestCase):
 
         arm_vfp  = notes[2]
         siginfo  = notes[3]
+
+        # Check NT_AUXV
+        # =================
         auxv     = notes[4]
+
+        self.assertTrue(auxv.is_core)
+        self.assertEqual(auxv.type_core, lief.ELF.NOTE_TYPES_CORE.AUXV)
+
+        # Check details
+        details = auxv.details
+
+        self.assertEqual(len(details.values), 18)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.PHDR], 0xaad74034)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.PHENT], 0x20)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.PHNUM], 0x9)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.PAGESZ], 4096)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.BASE], 0xf7716000)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.FLAGS], 0)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.ENTRY], 0xaad75074)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.UID], 2000)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.EUID], 2000)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.GID], 2000)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.EGID], 2000)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.PLATFORM], 0xfffefb5c)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.HWCAP], 0x27b0d6)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.CKLTCK], 0x64)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.SECURE], 0)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.RANDOM], 0xfffefb4c)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.HWCAP2], 0x1f)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.EXECFN], 0xfffeffec)
 
         # Check NT_FILE
         # =================
@@ -224,7 +253,36 @@ class TestCore(TestCase):
 
         arm_vfp  = notes[2]
         siginfo  = notes[3]
+
+        # Check NT_AUXV
+        # =================
         auxv     = notes[4]
+
+        self.assertTrue(auxv.is_core)
+        self.assertEqual(auxv.type_core, lief.ELF.NOTE_TYPES_CORE.AUXV)
+
+        # Check details
+        details = auxv.details
+
+        self.assertEqual(len(details.values), 18)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.PHDR], 0x5580b86040)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.PHENT], 0x38)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.PHNUM], 0x9)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.PAGESZ], 4096)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.BASE], 0x7fb7e93000)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.FLAGS], 0)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.ENTRY], 0x5580b86f50)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.UID], 2000)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.EUID], 2000)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.GID], 2000)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.EGID], 2000)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.PLATFORM], 0x7ffffffb58)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.HWCAP], 0xff)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.CKLTCK], 0x64)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.SECURE], 0)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.RANDOM], 0x7ffffffb48)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.EXECFN], 0x7fffffffec)
+        self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.SYSINFO_EHDR], 0x7fb7e91000)
 
         # Check NT_FILE
         # =================
@@ -253,9 +311,15 @@ class TestCore(TestCase):
     def test_core_write(self):
         core = lief.parse(get_sample('ELF/ELF64_x86-64_core_hello.core'))
         note = core.notes[1]
+        self.assertEqual(note.type_core, lief.ELF.NOTE_TYPES_CORE.PRSTATUS)
         details = note.details
 
         details[lief.ELF.CorePrStatus.REGISTERS.X86_64_RIP] = 0xBADC0DE
+
+        note = core.notes[5]
+        self.assertEqual(note.type_core, lief.ELF.NOTE_TYPES_CORE.AUXV)
+        details = note.details
+        details[lief.ELF.CoreAuxv.TYPES.ENTRY] = 0xBADC0DE
 
         with tempfile.NamedTemporaryFile(prefix="", suffix=".core") as f:
             core.write(f.name)
@@ -263,10 +327,16 @@ class TestCore(TestCase):
             core_new = lief.parse(f.name)
 
             note = core_new.notes[1]
+            self.assertEqual(note.type_core, lief.ELF.NOTE_TYPES_CORE.PRSTATUS)
             details = note.details
 
             self.assertEqual(details[lief.ELF.CorePrStatus.REGISTERS.X86_64_RIP], 0xBADC0DE)
 
+            note = core_new.notes[5]
+            self.assertEqual(note.type_core, lief.ELF.NOTE_TYPES_CORE.AUXV)
+            details = note.details
+
+            self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.ENTRY], 0xBADC0DE)
 
 
 if __name__ == '__main__':

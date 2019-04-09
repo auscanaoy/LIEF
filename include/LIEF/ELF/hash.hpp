@@ -56,6 +56,7 @@ class LIEF_API Hash : public LIEF::Hash {
   virtual void visit(const NoteAbi& note)                   override;
   virtual void visit(const CorePrPsInfo& pinfo)             override;
   virtual void visit(const CorePrStatus& pstatus)           override;
+  virtual void visit(const CoreAuxv& auxv)                  override;
   virtual void visit(const CoreFile& file)                  override;
   virtual void visit(const GnuHash& gnuhash)                override;
   virtual void visit(const SysvHash& sysvhash)              override;

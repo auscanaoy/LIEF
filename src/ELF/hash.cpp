@@ -260,6 +260,13 @@ void Hash::visit(const CorePrStatus& pstatus) {
   }
 }
 
+void Hash::visit(const CoreAuxv& auxv) {
+  for (const CoreAuxv::val_context_t::value_type& val : auxv.values()) {
+    this->process(val.first);  // Type
+    this->process(val.second); // Value
+  }
+}
+
 void Hash::visit(const CoreFile& file) {
   process(file.count());
   for (const CoreFileEntry& entry : file.files()) {
