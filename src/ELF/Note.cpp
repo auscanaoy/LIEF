@@ -250,26 +250,28 @@ void Note::dump(std::ostream& os) const {
   os << std::setw(33) << std::setfill(' ') << "Type:" << type_str << std::endl;
   os << std::setw(33) << std::setfill(' ') << "Description:" << description_str << std::endl;
 
-  // GOLD VERSION
-  if (this->type() == NOTE_TYPES::NT_GNU_GOLD_VERSION) {
-    std::string version_str{reinterpret_cast<const char*>(description.data()), description.size()};
-    os << std::setw(33) << std::setfill(' ') << "Version:" << version_str << std::endl;
-  }
+  if (not this->is_core()) {
+    // GOLD VERSION
+    if (this->type() == NOTE_TYPES::NT_GNU_GOLD_VERSION) {
+      std::string version_str{reinterpret_cast<const char*>(description.data()), description.size()};
+      os << std::setw(33) << std::setfill(' ') << "Version:" << version_str << std::endl;
+    }
 
-  // BUILD ID
-  if (this->type() == NOTE_TYPES::NT_GNU_BUILD_ID) {
-    std::string hash = std::accumulate(
-      std::begin(description),
-      std::end(description), std::string{},
-      [] (const std::string& a, uint8_t v) {
-        std::ostringstream hex_v;
-        hex_v << std::setw(2) << std::setfill('0') << std::hex;
-        hex_v << static_cast<uint32_t>(v);
+    // BUILD ID
+    if (this->type() == NOTE_TYPES::NT_GNU_BUILD_ID) {
+      std::string hash = std::accumulate(
+        std::begin(description),
+        std::end(description), std::string{},
+        [] (const std::string& a, uint8_t v) {
+          std::ostringstream hex_v;
+          hex_v << std::setw(2) << std::setfill('0') << std::hex;
+          hex_v << static_cast<uint32_t>(v);
 
-        return a + hex_v.str();
-      });
+          return a + hex_v.str();
+        });
 
-    os << std::setw(33) << std::setfill(' ') << "ID Hash:" << hash << std::endl;
+      os << std::setw(33) << std::setfill(' ') << "ID Hash:" << hash << std::endl;
+    }
   }
 
   this->details().dump(os);
