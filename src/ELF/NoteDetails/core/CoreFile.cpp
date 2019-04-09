@@ -72,7 +72,19 @@ bool CoreFile::operator!=(const CoreFile& rhs) const {
   return not (*this == rhs);
 }
 
-void CoreFile::dump(std::ostream&) const {
+void CoreFile::dump(std::ostream& os) const {
+  static constexpr size_t WIDTH = 16;
+  os << std::left;
+
+  os << std::setw(WIDTH) << std::setfill(' ') << "Files: "<< std::dec << std::endl;
+  for (const CoreFileEntry& file : this->files()) {
+    os << " - ";
+    os << file.path << " ";
+    os << "[" << std::hex << std::showbase << file.start << ", " << file.end << "] ";
+    os << file.file_ofs;
+    os << std::endl;
+  }
+  os << std::endl;
 }
 
 void CoreFile::parse(void) {
@@ -93,14 +105,6 @@ void CoreFile::build(void) {
 
 std::ostream& operator<<(std::ostream& os, const CoreFile& note) {
   note.dump(os);
-
-  for (const CoreFileEntry& file : note.files()) {
-    os << " - ";
-    os << file.path << " ";
-    os << "[" << std::hex << std::showbase << file.start << ", " << file.end << "] ";
-    os << file.file_ofs;
-    os << std::endl;
-  }
   return os;
 }
 
