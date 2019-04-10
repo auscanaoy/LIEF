@@ -10,6 +10,8 @@ set(LIEF_ELF_CORE_NOTES_SRC
 
   "${CMAKE_CURRENT_LIST_DIR}/CoreAuxv.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/CoreAuxv.tcc"
+
+  "${CMAKE_CURRENT_LIST_DIR}/CoreSigInfo.cpp"
 )
 
 set(LIEF_ELF_CORE_NOTES_INC
@@ -17,6 +19,7 @@ set(LIEF_ELF_CORE_NOTES_INC
   "${CMAKE_CURRENT_SOURCE_DIR}/include/LIEF/ELF/NoteDetails/core/CorePrStatus.hpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/include/LIEF/ELF/NoteDetails/core/CoreFile.hpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/include/LIEF/ELF/NoteDetails/core/CoreAuxv.hpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/include/LIEF/ELF/NoteDetails/core/CoreSigInfo.hpp"
 )
 
 if (LIEF_ELF)

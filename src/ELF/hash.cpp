@@ -267,6 +267,12 @@ void Hash::visit(const CoreAuxv& auxv) {
   }
 }
 
+void Hash::visit(const CoreSigInfo& siginfo) {
+  this->process(siginfo.signo());
+  this->process(siginfo.sigcode());
+  this->process(siginfo.sigerrno());
+}
+
 void Hash::visit(const CoreFile& file) {
   process(file.count());
   for (const CoreFileEntry& entry : file.files()) {

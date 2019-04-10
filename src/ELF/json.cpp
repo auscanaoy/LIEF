@@ -465,6 +465,12 @@ void JsonVisitor::visit(const CoreAuxv& auxv) {
   }
 }
 
+void JsonVisitor::visit(const CoreSigInfo& siginfo) {
+  this->node_["signo"] = siginfo.signo();
+  this->node_["sigcode"] = siginfo.sigcode();
+  this->node_["sigerrno"] = siginfo.sigerrno();
+}
+
 void JsonVisitor::visit(const CoreFile& file) {
   std::vector<json> files;
   for (const CoreFileEntry& entry : file.files()) {

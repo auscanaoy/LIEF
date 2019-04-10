@@ -101,7 +101,18 @@ class TestCore(TestCase):
         self.assertEqual(details.get(lief.ELF.CorePrStatus.REGISTERS.ARM_CPSR), 0x60010010)
 
         arm_vfp  = notes[2]
+
+        # Check NT_NOTE
+        # =================
         siginfo  = notes[3]
+        self.assertTrue(siginfo.is_core)
+        self.assertEqual(siginfo.type_core, lief.ELF.NOTE_TYPES_CORE.SIGINFO)
+
+        # Check details
+        details = siginfo.details
+        self.assertEqual(details.signo, 7)
+        self.assertEqual(details.sigcode, 0)
+        self.assertEqual(details.sigerrno, 1)
 
         # Check NT_AUXV
         # =================
@@ -252,7 +263,18 @@ class TestCore(TestCase):
         self.assertEqual(details[lief.ELF.CorePrStatus.REGISTERS.AARCH64_PC],  0x5580b86f50)
 
         arm_vfp  = notes[2]
+
+        # Check NT_NOTE
+        # =================
         siginfo  = notes[3]
+        self.assertTrue(siginfo.is_core)
+        self.assertEqual(siginfo.type_core, lief.ELF.NOTE_TYPES_CORE.SIGINFO)
+
+        # Check details
+        details = siginfo.details
+        self.assertEqual(details.signo, 5)
+        self.assertEqual(details.sigcode, 0)
+        self.assertEqual(details.sigerrno, 1)
 
         # Check NT_AUXV
         # =================
@@ -319,24 +341,48 @@ class TestCore(TestCase):
         note = core.notes[5]
         self.assertEqual(note.type_core, lief.ELF.NOTE_TYPES_CORE.AUXV)
         details = note.details
+
         details[lief.ELF.CoreAuxv.TYPES.ENTRY] = 0xBADC0DE
 
-        with tempfile.NamedTemporaryFile(prefix="", suffix=".core") as f:
-            core.write(f.name)
+        note = core.notes[4]
+        self.assertEqual(note.type_core, lief.ELF.NOTE_TYPES_CORE.SIGINFO)
+        orig_siginfo_len = len(note.description)
+        details = note.details
 
-            core_new = lief.parse(f.name)
+        details.sigerrno = 0xCC
 
-            note = core_new.notes[1]
-            self.assertEqual(note.type_core, lief.ELF.NOTE_TYPES_CORE.PRSTATUS)
-            details = note.details
+        #  Cannot re-open a file on Windows, so handle it by hand
+        with tempfile.NamedTemporaryFile(prefix="", suffix=".core", delete=False) as f:
+            tmpfilename = f.name
+            core.write(tmpfilename)
+        try:
+            with open(tmpfilename, 'rb') as f:
+                core_new = lief.parse(f.name)
+                self.assertIsNotNone(core_new)
 
-            self.assertEqual(details[lief.ELF.CorePrStatus.REGISTERS.X86_64_RIP], 0xBADC0DE)
+                note = core_new.notes[1]
+                self.assertEqual(note.type_core, lief.ELF.NOTE_TYPES_CORE.PRSTATUS)
+                details = note.details
 
-            note = core_new.notes[5]
-            self.assertEqual(note.type_core, lief.ELF.NOTE_TYPES_CORE.AUXV)
-            details = note.details
+                self.assertEqual(details[lief.ELF.CorePrStatus.REGISTERS.X86_64_RIP], 0xBADC0DE)
 
-            self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.ENTRY], 0xBADC0DE)
+                note = core_new.notes[5]
+                self.assertEqual(note.type_core, lief.ELF.NOTE_TYPES_CORE.AUXV)
+                details = note.details
+
+                self.assertEqual(details[lief.ELF.CoreAuxv.TYPES.ENTRY], 0xBADC0DE)
+
+                note = core_new.notes[4]
+                self.assertEqual(note.type_core, lief.ELF.NOTE_TYPES_CORE.SIGINFO)
+                self.assertEqual(len(note.description), orig_siginfo_len)
+                details = note.details
+
+                self.assertEqual(details.sigerrno, 0xCC)
+        finally:
+            try:
+                os.remove(tmpfilename)
+            except OSError:
+                pass
 
 
 if __name__ == '__main__':

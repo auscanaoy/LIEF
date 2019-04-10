@@ -161,6 +161,12 @@ NoteDetails& Note::details(void) {
           break;
         }
 
+      case NOTE_TYPES_CORE::NT_SIGINFO:
+        {
+          details.reset(new CoreSigInfo{CoreSigInfo::make(*this)});
+          break;
+        }
+
       default:
         break;
     }

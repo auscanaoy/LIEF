@@ -60,11 +60,11 @@ void CoreAuxv::build_(void) {
     // skip for now, will be added at the end
     if (type == AUX_TYPE::AT_NULL)
       continue;
-    const Elf_Auxv aux = { static_cast<uint__>(val.first), static_cast<uint__>(val.second) };
+    const Elf_Auxv aux = { static_cast<uint__>(val.first), {static_cast<uint__>(val.second)} };
     raw_output.write_conv(aux);
   }
   // AT_NULL
-  const Elf_Auxv terminator = {0, 0};
+  const Elf_Auxv terminator = {0, {0}};
   raw_output.write_conv(terminator);
 
   std::vector<uint8_t> raw = raw_output.raw();
