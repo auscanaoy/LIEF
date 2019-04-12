@@ -45,6 +45,10 @@ class LIEF_API CoreFile : public NoteDetails {
   public:
   using NoteDetails::NoteDetails;
 
+  using files_t        = std::vector<CoreFileEntry>;
+  using iterator       = files_t::iterator;
+  using const_iterator = files_t::const_iterator;
+
   public:
   static CoreFile make(Note& note);
 
@@ -52,9 +56,15 @@ class LIEF_API CoreFile : public NoteDetails {
   uint64_t count(void) const;
 
   //! Coredump file entries
-  std::vector<CoreFileEntry> files(void) const;
+  const files_t& files(void) const;
 
-  void files(const std::vector<CoreFileEntry>&);
+  iterator begin(void);
+  iterator end(void);
+
+  const_iterator begin(void) const;
+  const_iterator end(void) const;
+
+  void files(const files_t&);
 
   bool operator==(const CoreFile& rhs) const;
   bool operator!=(const CoreFile& rhs) const;
@@ -81,8 +91,8 @@ class LIEF_API CoreFile : public NoteDetails {
   CoreFile(Note& note);
 
   private:
-  std::vector<CoreFileEntry> files_;
-  uint64_t                   page_size_;
+  files_t   files_;
+  uint64_t  page_size_;
 };
 
 } // namepsace ELF

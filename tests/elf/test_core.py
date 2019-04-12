@@ -116,7 +116,7 @@ class TestCore(TestCase):
 
         # Check NT_AUXV
         # =================
-        auxv     = notes[4]
+        auxv = notes[4]
 
         self.assertTrue(auxv.is_core)
         self.assertEqual(auxv.type_core, lief.ELF.NOTE_TYPES_CORE.AUXV)
@@ -155,18 +155,22 @@ class TestCore(TestCase):
         details = note.details
         files   = details.files
 
-        self.assertEqual(len(files), details.count)
-        self.assertEqual(21, details.count)
+        self.assertEqual(len(files), len(details))
+        self.assertEqual(21, len(details))
 
         self.assertEqual(files[0].start, 0xaad74000)
         self.assertEqual(files[0].end,   0xaad78000)
         self.assertEqual(files[0].file_ofs, 0)
         self.assertEqual(files[0].path, "/data/local/tmp/hello-exe")
 
-        self.assertEqual(files[-1].start, 0xf77a1000)
-        self.assertEqual(files[-1].end,   0xf77a2000)
-        self.assertEqual(files[-1].file_ofs, 0x8a000)
-        self.assertEqual(files[-1].path, "/system/bin/linker")
+        last = files.pop()
+
+        self.assertEqual(last.start,    0xf77a1000)
+        self.assertEqual(last.end,      0xf77a2000)
+        self.assertEqual(last.file_ofs, 0x8a000)
+        self.assertEqual(last.path, "/system/bin/linker")
+
+        self.assertTrue(all(len(c.path) > 0 for c in details))
 
 
     def test_core_arm64(self):
@@ -317,18 +321,19 @@ class TestCore(TestCase):
         details = note.details
         files   = details.files
 
-        self.assertEqual(len(files), details.count)
-        self.assertEqual(22, details.count)
+        self.assertEqual(len(files), len(details))
+        self.assertEqual(22, len(details))
 
         self.assertEqual(files[0].start, 0x5580b86000)
         self.assertEqual(files[0].end,   0x5580b88000)
         self.assertEqual(files[0].file_ofs, 0)
         self.assertEqual(files[0].path, "/data/local/tmp/hello-exe")
 
-        self.assertEqual(files[-1].start, 0x7fb7f8c000)
-        self.assertEqual(files[-1].end,   0x7fb7f8d000)
-        self.assertEqual(files[-1].file_ofs, 0xf8000)
-        self.assertEqual(files[-1].path, "/system/bin/linker64")
+        last = files.pop()
+        self.assertEqual(last.start, 0x7fb7f8c000)
+        self.assertEqual(last.end,   0x7fb7f8d000)
+        self.assertEqual(last.file_ofs, 0xf8000)
+        self.assertEqual(last.path, "/system/bin/linker64")
 
     def test_core_write(self):
         core = lief.parse(get_sample('ELF/ELF64_x86-64_core_hello.core'))

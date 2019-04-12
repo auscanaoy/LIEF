@@ -41,18 +41,28 @@ uint64_t CoreFile::count(void) const {
   return this->files_.size();
 }
 
-std::vector<CoreFileEntry> CoreFile::files(void) const {
-  std::vector<CoreFileEntry> entries;
-  entries.reserve(this->count());
-  std::copy(
-      std::begin(this->files_),
-      std::end(this->files_),
-      std::back_inserter(entries));
-  return entries;
+const CoreFile::files_t& CoreFile::files(void) const {
+  return this->files_;
 }
 
 
-void CoreFile::files(const std::vector<CoreFileEntry>& files) {
+CoreFile::iterator CoreFile::begin(void) {
+  return std::begin(this->files_);
+}
+
+CoreFile::iterator CoreFile::end(void) {
+  return std::end(this->files_);
+}
+
+CoreFile::const_iterator CoreFile::begin(void) const {
+  return std::begin(this->files_);
+}
+
+CoreFile::const_iterator CoreFile::end(void) const {
+  return std::end(this->files_);
+}
+
+void CoreFile::files(const CoreFile::files_t& files) {
   this->files_ = files;
   this->build();
 }

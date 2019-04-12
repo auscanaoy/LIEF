@@ -34,17 +34,25 @@ using setter_t = void (CoreFile::*)(T);
 template<>
 void create<CoreFile>(py::module& m) {
 
+  py::bind_vector<CoreFile::files_t>(m, "CoreFile.files_t");
+
   py::class_<CoreFile, NoteDetails>(m, "CoreFile")
 
-    .def_property_readonly("count",
+    .def_property("files",
+        static_cast<getter_t<const CoreFile::files_t&>>(&CoreFile::files),
+        static_cast<setter_t<const CoreFile::files_t&>>(&CoreFile::files),
+        "List of files mapped in core")
+
+    .def("__len__",
         &CoreFile::count,
         "Number of files mapped in core"
         )
 
-	.def_property("files",
-        static_cast<getter_t<std::vector<CoreFileEntry>>>(&CoreFile::files),
-        static_cast<setter_t<const std::vector<CoreFileEntry>&>>(&CoreFile::files),
-        "List of files mapped in core")
+    .def("__iter__",
+        [] (const CoreFile& f) {
+          return py::make_iterator(std::begin(f), std::end(f));
+        },
+        py::keep_alive<0, 1>())
 
     .def("__eq__", &CoreFile::operator==)
     .def("__ne__", &CoreFile::operator!=)
