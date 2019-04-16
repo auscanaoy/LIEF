@@ -850,8 +850,8 @@ enum _LIEF_EN(AUX_TYPE) {
    _LIEF_EI(AT_PLATFORM)      = 15,    /**< String identifying platform.  */
    _LIEF_EI(AT_HWCAP)         = 16,    /**< Machine dependent hints about processor capabilities.  */
 
-   /* This entry g  ives some information about the FPU initialization
-      performed by   the kernel.  */
+   /* This entry gives some information about the FPU initialization
+      performed by the kernel. */
 
    _LIEF_EI(AT_FPUCW)        = 18,    /**< Used FPU control word.  */
 
@@ -860,8 +860,8 @@ enum _LIEF_EN(AUX_TYPE) {
    _LIEF_EI(AT_ICACHEBSIZE)   = 20,    /**< Instruction cache block size.  */
    _LIEF_EI(AT_UCACHEBSIZE)   = 21,    /**< Unified cache block size.  */
 
-   /* A special ig  nored value for PPC, used by the kernel to control the
-      interpretati  on of the AUXV. Must be > 16.  */
+   /* A special ignored value for PPC, used by the kernel to control the
+      interpretation of the AUXV. Must be > 16.  */
 
    _LIEF_EI(AT_IGNOREPPC)     = 22,    /**< Entry should be ignored.  */
    _LIEF_EI(AT_SECURE)        = 23,    /**< Boolean, was exec setuid-like?  */
@@ -871,7 +871,7 @@ enum _LIEF_EN(AUX_TYPE) {
    _LIEF_EI(AT_EXECFN)        = 31,    /**< Filename of executable.  */
 
    /* Pointer to the global system page used for system calls and other
-      nice things.  */
+      nice things. */
    _LIEF_EI(AT_SYSINFO)       = 32,
    _LIEF_EI(AT_SYSINFO_EHDR)  = 33,
 

@@ -243,6 +243,28 @@ Core PrStatus
 
 ----------
 
+
+Core Siginfo
+************
+
+.. autoclass:: lief.ELF.CoreSigInfo
+  :members:
+  :inherited-members:
+  :undoc-members:
+
+----------
+
+
+Core Auxiliary Vector
+*********************
+
+.. autoclass:: lief.ELF.CoreAuxv
+  :members:
+  :inherited-members:
+  :undoc-members:
+
+----------
+
 Android Note
 *************
 

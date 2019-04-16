@@ -181,6 +181,23 @@ Core PrStatus
 
 ----------
 
+
+Core Siginfo
+*************
+
+.. doxygenclass:: LIEF::ELF::CoreSigInfo
+   :project: lief
+
+----------
+
+Core Auxiliary Vector
+*********************
+
+.. doxygenclass:: LIEF::ELF::CoreAuxv
+   :project: lief
+
+----------
+
 Android Note
 ************
 

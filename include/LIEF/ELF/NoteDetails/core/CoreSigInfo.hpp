@@ -34,7 +34,7 @@ class Parser;
 class Builder;
 class Binary;
 
-//! Class representing core Auxv object
+//! Class representing core siginfo object
 class LIEF_API CoreSigInfo : public NoteDetails {
 
   public:
@@ -45,8 +45,10 @@ class LIEF_API CoreSigInfo : public NoteDetails {
 
   //! Signal number.
   int32_t signo(void) const;
+
   //! Signal code.
   int32_t sigcode(void) const;
+
   //! If non-zero, an errno value associated with this signal.
   int32_t sigerrno(void) const;
 

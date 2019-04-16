@@ -282,7 +282,7 @@ class TestCore(TestCase):
 
         # Check NT_AUXV
         # =================
-        auxv     = notes[4]
+        auxv = notes[4]
 
         self.assertTrue(auxv.is_core)
         self.assertEqual(auxv.type_core, lief.ELF.NOTE_TYPES_CORE.AUXV)
